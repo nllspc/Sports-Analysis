@@ -1,4 +1,4 @@
 # Sports-Analysis
 Contains various sports analysis projects  
-Current: Creating evaluation tool for Reds HOF nomineees  
+Current: Creating a Reds HOF nominee evaluation tool  
 Completed:  
