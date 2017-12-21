@@ -6,20 +6,78 @@
 
 library(tidyverse)
 library(openWARData)
+library(Lahman)
 
-# Career WAR
-carWar <- indWarT %>% group_by(playerId) %>%
-        summarize(careerWAR = sum(rWAR), PeakWAR = max(rWAR)) %>%
-        ungroup()
+nomId <- read_rds("data/nomineeIds.rds")
+indId <- read_rds("data/inducteeIdsFinal.rds")
+nomWarT <- read_rds("data/nomineeWARtotal.rds")
+nomWarR <- read_rds("data/nomineeWARreds.rds")
+indWarT <- read_rds("data/inducteeWARtotal.rds")
+indWarR <- read_rds("data/inducteeWARreds.rds")
+warJaws <- read_rds("data/WARandJAWS.rds")
+redsWarJaws <- read_rds("data/redsWARandJAWS.rds")
 
-WAR6 <- indWarT %>% group_by(playerId) %>% top_n(6, rWAR) %>% tally(rWAR) %>% rename(WAR6 = n)
+
+# Inductee War total without Craft who only had 6 yrs MLB service
+indWarTnoC <- indWarT %>% filter(playerId != "craftha01")
+
+# Career WAR and PeakWAR
+carWardat <- indWarTnoC %>%
+      group_by(playerId) %>%
+      summarize(careerWAR = sum(rWAR), PeakWAR = max(rWAR)) %>%
+      ungroup()
+
+# WAR7 best seven WAR years
+WAR7dat <- indWarTnoC %>%
+      group_by(playerId) %>%
+      top_n(7, rWAR) %>%
+      tally(rWAR) %>%
+      rename(WAR7 = n)
  
-carWar <- carWar %>% add_column(WAR6 = WAR6$WAR6)
-carWar <- mutate(carWar, JAWS = round((careerWAR + WAR6)/2, 2))
-        
-       
-# Reds career WAR
+# Adding WAR7 column and calculating JAWS
+warJaws <- carWardat %>% add_column(WAR7 = WAR7dat$WAR7)
+warJaws <- mutate(warJaws, JAWS = round((careerWAR + WAR7)/2, 2))
+
+# Joining warJAWS and inductee Id tables; rearranging columns
+yearTot <- indWarT %>%
+      select(playerId, yearId) %>%
+      group_by(playerId) %>%
+      summarize(sumYr = n_distinct(yearId))
+yearTotc <- yearTot %>% filter(playerId != "craftha01")
+warJaws <- warJaws %>% add_column(totalYrs = yearTotc$sumYr)
+indIdnoC <- indId %>% filter(playerId != "craftha01")
+warJaws <- inner_join(warJaws, indIdnoC, by = "playerId")
+warJaws <- warJaws %>% select(playerId, fangraphs_id, name_whole, POS, totalYrs, careerWAR, PeakWAR, WAR7, JAWS, name_first, name_last)
+
+write_rds(warJaws, "data/WARandJAWS.rds")
+
+
+#=================================================
+
+# Reds career WAR and Peak War
 carWarR <- indWarR %>% group_by(playerId) %>%
-        summarize(RedsWAR = sum(rWAR), PeakRedsWAR = max(rWAR), AvgRedsWAR = round(mean(rWAR),2)) %>% 
+        summarize(redsWAR = sum(rWAR), redsPeakWAR = max(rWAR)) %>% 
         ungroup()
 
+# Calculating top 4 WAR years
+redsWAR4dat <- indWarR %>%
+      group_by(playerId) %>%
+      top_n(4, rWAR) %>%
+      tally(rWAR) %>%
+      rename(WAR4 = n)
+
+# Adding WAR4 and calculating JAWS; reordering columns
+redsWarJaws <- carWarR %>% add_column(redsWAR4 = redsWAR4dat$WAR4)
+redsWarJaws <- mutate(redsWarJaws, redsJAWS = round((redsWAR + redsWAR4)/2, 2))
+redsWarJaws <- redsWarJaws %>% select(playerId, redsWAR, redsPeakWAR, redsWAR4, redsJAWS)
+
+# Joining dataframes to get names, pos, etc. with jaws and war. Adding total years as a Red.
+redsWarJaws <- inner_join(redsWarJaws, indId, by = "playerId")
+yearTotR <- indWarR %>%
+      select(playerId, yearId) %>%
+      group_by(playerId) %>%
+      summarize(sumYr = n_distinct(yearId))
+redsWarJaws <- redsWarJaws %>% add_column(totalYrs = yearTotR$sumYr)
+redsWarJaws <- redsWarJaws %>% select(playerId, fangraphs_id, name_whole, POS, totalYrs, redsWAR, redsPeakWAR, redsWAR4, redsJAWS, name_first, name_last)
+
+write_rds(redsWarJaws, "data/redsWARandJAWS.rds")
