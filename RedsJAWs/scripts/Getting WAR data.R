@@ -36,7 +36,8 @@ nomIdList <- as.character(nomIdList[[1]])
 nomWarDat <- map_dfr(nomIdList, warFilter)
 nomWarDatT <- nomWarDat %>% group_by(playerId) %>%
   select(playerId, yearId, teamId, rWAR) %>% ungroup() %>%
-  mutate(playerId = as.character(playerId))
+  mutate(playerId = as.character(playerId)) %>% 
+      
 
 # Just the Reds years
 nomWarDatR <- filter(nomWarDatT, teamId == "CIN")
