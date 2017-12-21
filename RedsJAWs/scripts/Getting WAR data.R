@@ -6,6 +6,10 @@
 
 library(tidyverse)
 library(openWARData)
+library(Lahman)
+
+nomId <- read_rds("data/nomineeIds.rds")
+indId <- read_rds("data/inducteeIdsFinal.rds")
 
 # Creating inductee (aka member) list
 indIdList <- list(indId$playerId)
@@ -36,29 +40,29 @@ nomIdList <- as.character(nomIdList[[1]])
 nomWarDat <- map_dfr(nomIdList, warFilter)
 nomWarDatT <- nomWarDat %>% group_by(playerId) %>%
   select(playerId, yearId, teamId, rWAR) %>% ungroup() %>%
-  mutate(playerId = as.character(playerId)) %>% 
+  mutate(playerId = as.character(playerId))
       
 
 # Just the Reds years
 nomWarDatR <- filter(nomWarDatT, teamId == "CIN")
 
 # Lets make some files to save this progress
-write_rds(members, "Data/memberScrape.rds")
-write_rds(indId, "Data/inducteeIds.rds")
-write_rds(nomId, "Data/nomineeIds.rds")
-write_rds(indWarDatT, "Data/inducteeWARtotal.rds")
-write_rds(indWarDatR, "Data/inducteeWARreds.rds")
-write_rds(nomWarDatT, "Data/nomineeWARtotal.rds")
-write_rds(nomWarDatR, "Data/nomineeWARreds.rds")
+write_rds(members, "data/memberScrape.rds")
+write_rds(indId, "data/inducteeIdsFinal.rds")
+write_rds(nomId, "data/nomineeIds.rds")
+write_rds(indWarDatT, "data/inducteeWARtotal.rds")
+write_rds(indWarDatR, "data/inducteeWARreds.rds")
+write_rds(nomWarDatT, "data/nomineeWARtotal.rds")
+write_rds(nomWarDatR, "data/nomineeWARreds.rds")
 
 # Load the files
-members <- read_rds("Data/memberScrape.rds")
-nomId <- read_rds("Data/nomineeIds.rds")
-indId <- read_rds("Data/inducteeIds.rds")
-nomWarT <- read_rds("Data/nomineeWARtotal.rds")
-nomWarR <- read_rds("Data/nomineeWARreds.rds")
-indWarT <- read_rds("Data/inducteeWARtotal.rds")
-indWarR <- read_rds("Data/inducteeWARreds.rds")
+members <- read_rds("data/memberScrape.rds")
+nomId <- read_rds("data/nomineeIds.rds")
+indId <- read_rds("data/inducteeIdsFinal.rds")
+nomWarT <- read_rds("data/nomineeWARtotal.rds")
+nomWarR <- read_rds("data/nomineeWARreds.rds")
+indWarT <- read_rds("data/inducteeWARtotal.rds")
+indWarR <- read_rds("data/inducteeWARreds.rds")
 
 
 # Ready for some damn analysis

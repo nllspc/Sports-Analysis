@@ -13,15 +13,10 @@ head(idTT)
 idTTa <- idTT %>% select(key_bbref, key_fangraphs, name_last, name_first) %>% 
   mutate(name_whole= paste(name_first, name_last)) %>% 
   rename(playerId = key_bbref, fangraphs_id = key_fangraphs)
-str(idTTa)
-head(idTTa)
 
 # Taking column from other tibble and coercing into a list
 inductees <- list(members[,"Inductee"])
 inductees <- inductees[[1]]
-str(inductees)
-head(inductees)
-
 
 
 
@@ -98,7 +93,7 @@ write_rds(indIdFinal, "data/inducteeIdsFinal.rds")
 # Now need the nominees
 nomNamList <- list("Aaron Boone", "Adam Dunn", "John Franco", "Danny Graves", "Scott Rolen",
                    "Reggie Sanders")
-nomId <- map_dfr(nomNamList, indFilter2)
+nomId <- map_dfr(nomNamList, indFilter)
 
 # Snagged an extra Sanders. Filtered rWAR again. Dropping the older one.
 nomId <- filter(nomId, playerId != "sandere01")
