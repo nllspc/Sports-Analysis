@@ -38,7 +38,7 @@ WAR7dat <- indWarTnoC %>%
 warJaws <- carWardat %>% add_column(WAR7 = WAR7dat$WAR7)
 warJaws <- mutate(warJaws, JAWS = round((careerWAR + WAR7)/2, 2))
 
-# Joining warJAWS and inductee Id tables; rearranging columns
+# Joining warJAWS and inductee Id tables; Adding totalYrs col; rearranging columns
 yearTot <- indWarT %>%
       select(playerId, yearId) %>%
       group_by(playerId) %>%
@@ -52,7 +52,7 @@ warJaws <- warJaws %>% select(playerId, fangraphs_id, name_whole, POS, totalYrs,
 write_rds(warJaws, "data/WARandJAWS.rds")
 
 
-#=================================================
+# Reds Years ===================================
 
 # Reds career WAR and Peak War
 carWarR <- indWarR %>% group_by(playerId) %>%
@@ -81,3 +81,70 @@ redsWarJaws <- redsWarJaws %>% add_column(totalYrs = yearTotR$sumYr)
 redsWarJaws <- redsWarJaws %>% select(playerId, fangraphs_id, name_whole, POS, totalYrs, redsWAR, redsPeakWAR, redsWAR4, redsJAWS, name_first, name_last)
 
 write_rds(redsWarJaws, "data/redsWARandJAWS.rds")
+
+
+
+# Nominees==================================================================
+
+
+nomWarT <- read_rds("data/nomineeWARtotal.rds")
+nomWarR <- read_rds("data/nomineeWARreds.rds")
+
+# Career WAR
+nCarWardat <- nomWarT %>%
+      group_by(playerId) %>%
+      summarize(careerWAR = sum(rWAR), PeakWAR = max(rWAR)) %>%
+      ungroup()
+
+# sum of Top 7 WAR years
+nWAR7dat <- nomWarT %>%
+      group_by(playerId) %>%
+      top_n(7, rWAR) %>%
+      tally(rWAR) %>%
+      rename(WAR7 = n)
+
+# Career JAWS calculation
+nWarJaws <- nCarWardat %>% add_column(WAR7 = nWAR7dat$WAR7)
+nWarJaws <- mutate(nWarJaws, JAWS = round((careerWAR + WAR7)/2, 2))
+
+# Joining warJAWS and inductee Id tables; Adding totalYrs col; rearranging columns
+nYearTot <- nomWarT %>%
+      select(playerId, yearId) %>%
+      group_by(playerId) %>%
+      summarize(sumYr = n_distinct(yearId))
+nWarJaws <- nWarJaws %>% add_column(totalYrs = nYearTot$sumYr)
+nWarJaws <- inner_join(nWarJaws, nomId, by = "playerId")
+nWarJaws <- nWarJaws %>% select(playerId, fangraphs_id, name_whole, POS, totalYrs, careerWAR, PeakWAR, WAR7, JAWS, name_first, name_last)
+
+write_rds(nWarJaws, "data/nomWARandJAWS.rds")
+
+
+# Reds years ==============================
+
+# WAR during tenure as Red
+nWarRdat <- nomWarR %>% group_by(playerId) %>%
+      summarize(redsWAR = sum(rWAR), redsPeakWAR = max(rWAR)) %>% 
+      ungroup()
+
+# sum of Top 4 WAR years as Red
+nRedsWAR4dat <- nomWarR %>%
+      group_by(playerId) %>%
+      top_n(4, rWAR) %>%
+      tally(rWAR) %>%
+      rename(WAR4 = n)
+
+# Adding WAR4 and calculating JAWS; reordering columns
+nRedsWarJaws <- nWarRdat %>% add_column(redsWAR4 = nRedsWAR4dat$WAR4)
+nRedsWarJaws <- mutate(nRedsWarJaws, redsJAWS = round((redsWAR + redsWAR4)/2, 2))
+nRedsWarJaws <- nRedsWarJaws %>% select(playerId, redsWAR, redsPeakWAR, redsWAR4, redsJAWS)
+
+# Joining dataframes to get names, pos, etc. with jaws and war. Adding tenure as a Red.
+nRedsWarJaws <- inner_join(nRedsWarJaws, nomId, by = "playerId")
+nYearTotR <- nomWarR %>%
+      select(playerId, yearId) %>%
+      group_by(playerId) %>%
+      summarize(sumYr = n_distinct(yearId))
+nRedsWarJaws <- nRedsWarJaws %>% add_column(tenure = nYearTotR$sumYr)
+nRedsWarJaws <- nRedsWarJaws %>% select(playerId, fangraphs_id, name_whole, POS, tenure, redsWAR, redsPeakWAR, redsWAR4, redsJAWS, name_first, name_last)
+
+write_rds(nRedsWarJaws, "data/nomRedsWARandJAWS.rds")
