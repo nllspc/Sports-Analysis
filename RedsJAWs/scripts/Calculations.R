@@ -49,10 +49,10 @@ indIdnoC <- indId %>% filter(playerId != "craftha01")
 warJaws <- inner_join(warJaws, indIdnoC, by = "playerId")
 warJaws <- warJaws %>% select(playerId, fangraphs_id, name_whole, POS, totalYrs, careerWAR, PeakWAR, WAR7, JAWS, name_first, name_last)
 
-write_rds(warJaws, "data/WARandJAWS.rds")
+write_rds(warJaws, "data/indCarWARandJAWS.rds")
 
 
-# Reds Years ===================================
+# Reds Years =========================
 
 # Reds career WAR and Peak War
 carWarR <- indWarR %>% group_by(playerId) %>%
@@ -80,11 +80,11 @@ yearTotR <- indWarR %>%
 redsWarJaws <- redsWarJaws %>% add_column(totalYrs = yearTotR$sumYr)
 redsWarJaws <- redsWarJaws %>% select(playerId, fangraphs_id, name_whole, POS, totalYrs, redsWAR, redsPeakWAR, redsWAR4, redsJAWS, name_first, name_last)
 
-write_rds(redsWarJaws, "data/redsWARandJAWS.rds")
+write_rds(redsWarJaws, "data/indRedsWARandJAWS.rds")
 
 
 
-# Nominees==================================================================
+# Nominees=========================================================
 
 
 nomWarT <- read_rds("data/nomineeWARtotal.rds")
@@ -116,10 +116,10 @@ nWarJaws <- nWarJaws %>% add_column(totalYrs = nYearTot$sumYr)
 nWarJaws <- inner_join(nWarJaws, nomId, by = "playerId")
 nWarJaws <- nWarJaws %>% select(playerId, fangraphs_id, name_whole, POS, totalYrs, careerWAR, PeakWAR, WAR7, JAWS, name_first, name_last)
 
-write_rds(nWarJaws, "data/nomWARandJAWS.rds")
+write_rds(nWarJaws, "data/nomCarWARandJAWS.rds")
 
 
-# Reds years ==============================
+# Reds years ========================
 
 # WAR during tenure as Red
 nWarRdat <- nomWarR %>% group_by(playerId) %>%

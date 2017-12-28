@@ -1,4 +1,4 @@
-# Positional Distributions
+# Reds WAR positions
 # Need to figure out what the primary position was during inductees' top 4 WAR years so I can create position distributions
 
 
@@ -7,7 +7,7 @@ library(openWARData)
 library(Lahman)
 
 
-redsWarJaws <- read_rds("data/redsWARandJAWS.rds")
+redsWarJaws <- read_rds("data/indRedsWARandJAWS.rds")
 indWarR <- read_rds("data/inducteeWARreds.rds")
 
 # Getting player IDs and their top 4 WAR years
@@ -57,7 +57,7 @@ redsWarJaws <- inner_join(redsWarJaws, posDat4, by = "playerId")
 redsWarJaws <- redsWarJaws %>% select(playerId, fangraphs_id, name_whole, totalYrs, redsWAR, redsPeakWAR, redsWAR4, redsJAWS, POS, name_first, name_last) %>% 
       rename(tenure = totalYrs)
 
-write_rds(redsWarJaws, "data/redsWARandJAWS.rds")
+write_rds(redsWarJaws, "data/indRedsWARandJAWS.rds")
 
 
 # Nominees=======================================
