@@ -10,52 +10,43 @@ library(Lahman)
 redsWarJaws <- read_rds("data/indRedsWARandJAWS.rds")
 indWarR <- read_rds("data/inducteeWARreds.rds")
 
-# Getting player IDs and their top 4 WAR years
-war4YearsDat <- indWarR %>%
-      group_by(playerId) %>%
-      top_n(4, rWAR)
 
-# Making lists for map functions
-idList <- list(war4YearsDat$playerId)
-idList <- idList[[1]]
-yearList <- list(war4YearsDat$yearId)
-yearList <- yearList[[1]]
+# Making id, years lists for map functions
+idList2 <- list(indWarR$playerId)
+idList2 <- idList2[[1]]
+yearList2 <- list(indWarR$yearId)
+yearList2 <- yearList2[[1]]
 
-# Using lists to filter Fielding data set
+# Using lists to filter Fielding data set for inductees and seasons as a Red
 aFilter <- function(x,y) filter(Fielding, playerID == x & yearID == y)
-posDat2 <- map2_dfr(idList, yearList, aFilter)
+# Fielding dataset has some weird designations for 1800's Reds teams: CN1 and CN2.
+posDat <- map2_dfr(idList2, yearList2, aFilter) %>% 
+      filter(teamID == "CIN" | teamID == "CN1" | teamID == "CN2")
 
-# Getting the position where each player played the most games for each of the 4 yrs
-posDat3 <- posDat2 %>% select(playerID, yearID, POS, G) %>% 
-      group_by(playerID, yearID) %>% 
-      filter(G == max(G)) %>% 
-      ungroup()
-
-# Calculating position each player played the most over the WAR4 years
-posDat4 <- posDat3 %>% 
-      select(playerID, POS) %>% 
+# Getting position with most games as a Red
+posDat2 <- posDat %>%
+      select(playerID, POS, G) %>% 
       group_by(playerID, POS) %>% 
-      summarize(nPOS = n()) %>% 
-      filter(nPOS == max(nPOS)) %>% 
+      summarise(sumG = sum(G)) %>% 
+      filter(sumG == max(sumG)) %>% 
       ungroup() %>% 
       select(playerID, POS)
 
-# Jim O'Toole's ID isn't showing up in the Fielding data set but he was a pitcher his whole career. Double-checked. Adding him into the df.
-indPosList <- list(indPos$playerID)
-indPosList <- indPosList[[1]]
-setdiff(idList, indPosList)
-posDat4 <- posDat4 %>% 
+# Jim O'Toole's ID isn't showing up in the Fielding data set but he was a pitcher his whole career. Double-checked. Adding him to the df.
+# Renaming playerID to join with another df
+setdiff(redsWarJaws$playerId, posDat2$playerID)
+posDat2 <- posDat2 %>% 
       add_row(playerID = "o'tooji01", POS = "P") %>% 
       rename(playerId = playerID)
 
 # Removing the old POS column which I evidently didn't need to go to the trouble to add in the first place. Joining both dataframes to add new POS. Ugh could've just done an add_column but I'm tired. 
-redsWarJaws <- redsWarJaws %>% select(playerId, fangraphs_id, name_whole, totalYrs, redsWAR, redsPeakWAR, redsWAR4, redsJAWS, name_first, name_last)
-
-redsWarJaws <- inner_join(redsWarJaws, posDat4, by = "playerId")
+redsWarJaws <- redsWarJaws %>% select(-POS) %>% 
+      inner_join(posDat2, by = "playerId")%>%
+      select(playerId, fangraphs_id, name_whole, totalYrs, redsWAR, redsPeakWAR, redsWAR4, redsJAWS, POS, name_first, name_last) %>% 
+      rename(tenure = totalYrs)
 
 # Reordering columns and renaming totalYrs to tenure because I think it's more accurate.
-redsWarJaws <- redsWarJaws %>% select(playerId, fangraphs_id, name_whole, totalYrs, redsWAR, redsPeakWAR, redsWAR4, redsJAWS, POS, name_first, name_last) %>% 
-      rename(tenure = totalYrs)
+redsWarJaws <- redsWarJaws 
 
 write_rds(redsWarJaws, "data/indRedsWARandJAWS.rds")
 
@@ -65,44 +56,32 @@ write_rds(redsWarJaws, "data/indRedsWARandJAWS.rds")
 nomWarR <- read_rds("data/nomineeWARreds.rds")
 nRedsWarJaws <- read_rds("data/nomRedsWARandJAWS.rds")
 
-# Getting player IDs and their top 4 WAR years
-nRedsWar4YearsDat <- nomWarR %>%
-      group_by(playerId) %>%
-      top_n(4, rWAR)
 
 # Making lists for map functions
-nIdList <- list(nRedsWar4YearsDat$playerId)
+nIdList <- list(nomWarR$playerId)
 nIdList <- nIdList[[1]]
-nYearList <- list(nRedsWar4YearsDat$yearId)
+nYearList <- list(nomWarR$yearId)
 nYearList <- nYearList[[1]]
 
 # Using lists to filter Fielding data set
 aFilter <- function(x,y) filter(Fielding, playerID == x & yearID == y)
-nPosDat2 <- map2_dfr(nIdList, nYearList, aFilter)
+nPosDat <- map2_dfr(nIdList, nYearList, aFilter)
 
 # Getting the position where each player played the most games for each of the 4 yrs
-nPosDat3 <- nPosDat2 %>% select(playerID, yearID, POS, G) %>% 
-      group_by(playerID, yearID) %>% 
-      filter(G == max(G)) %>% 
-      ungroup()
-
-# Calculating with position each player played the most over the WAR4 years
-nPosDat4 <- nPosDat3 %>% 
-      select(playerID, POS) %>% 
+nPosDat2 <- nPosDat %>%
+      select(playerID, POS, G) %>% 
       group_by(playerID, POS) %>% 
-      summarize(nPOS = n()) %>% 
-      filter(nPOS == max(nPOS)) %>% 
+      summarise(sumG = sum(G)) %>% 
+      filter(sumG == max(sumG)) %>% 
       ungroup() %>% 
       select(playerID, POS) %>% 
       rename(playerId = playerID)
 
 # Removing the old POS column Joining both dataframes to add new POS.
-nRedsWarJaws <- nRedsWarJaws %>% select(playerId, fangraphs_id, name_whole, tenure, redsWAR, redsPeakWAR, redsWAR4, redsJAWS, name_first, name_last)
+nRedsWarJaws <- nRedsWarJaws %>% select(-POS) %>% 
+      inner_join(nPosDat2, by = "playerId") %>% 
+      select(playerId, fangraphs_id, name_whole, tenure, redsWAR, redsPeakWAR, redsWAR4, redsJAWS, POS, name_first, name_last)
 
-nRedsWarJaws <- inner_join(nRedsWarJaws, nPosDat4, by = "playerId")
-
-# Reordering columns
-nRedsWarJaws <- nRedsWarJaws %>% select(playerId, fangraphs_id, name_whole, tenure, redsWAR, redsPeakWAR, redsWAR4, redsJAWS, POS, name_first, name_last)
 
 write_rds(nRedsWarJaws, "data/nomRedsWARandJAWS.rds")
 

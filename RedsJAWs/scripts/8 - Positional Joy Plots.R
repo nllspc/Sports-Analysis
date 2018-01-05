@@ -8,9 +8,6 @@ library(cowplot)
 library(ggbeeswarm)
 
 
-
-# Weighted Positional Distributions =======================
-
 # Combining Pitcher and regular position player distributions
 batPosDistrbWt <- read_rds("data/weightedPositionDistributions.rds")
 pitPosDistrb <- read_rds("data/pitcherPositionDistribution.rds") %>% 
@@ -20,10 +17,15 @@ compPosDistrb <- bind_rows(batPosDistrbWt,pitPosDistrb)
 compPosDistrb$POSf <- as.factor(compPosDistrb$POS)
 
 
+
+
+# Weighted Positional Distributions =======================
+
+
 # Adding HOF distribution
 compPosDistrbA <- compPosDistrb %>% 
       select(-POS, -POSf) %>% 
-      add_column(POS = rep("Reds HOF", 141))
+      add_column(POS = rep("Reds HOF", nrow(compPosDistrb)))
 
 compPosDistrB <- compPosDistrb %>% 
       select(-POSf)
