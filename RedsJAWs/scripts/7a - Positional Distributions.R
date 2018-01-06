@@ -1,5 +1,5 @@
 # POS distributions
-
+# sections: EDA (Pitchers, Position Players), Weighted Position Distribution 
 
 
 
@@ -13,12 +13,16 @@ iPitRedsWandJ <- iRedsWandJ %>%
 iBatRedsWandJ <- iRedsWandJ %>% 
       filter(POS != "P")
 
-# When we compute the "average" HOF WAR and JAWS to fill our distributions, do we use the mean or median?
+
 # EDA ==============================================
 
+# When we compute the "average" HOF WAR and JAWS to fill our distributions, do we use the mean or median?
+
+
+
+# Pitchers ===============
 
 # For now I'm not splitting these into P and RP so not immediately useful but I'm going to take a look at the pitcher distributions all the same.
-# Pitchers ===============
 
 # redsWAR mean = 26.08, median = 26.02
 # redsWAR4 mean = 18.95, median = 18.21
@@ -59,7 +63,7 @@ iPitRedsWandJ_gathered %>% ggplot(aes(x = Metric, y = Value)) +
 
 
 
-# Hitters ==================
+# Position Players ==================
 
 # redsWAR mean = 25.07, median = 18.25
 # redsWAR4 mean = 15.63, median = 13.71
@@ -106,10 +110,10 @@ avgHOFJAWS <- round((median(iBatRedsWandJ$redsWAR) + median(iBatRedsWandJ$redsWA
 
 
 
-# Create Tibble of filler players =========================================
+# Create Weighted Position Distribution df ========================
 
 
-# OF has the most inductees with 19. 1B is second with 10. In the future I'll want to split OF into LF/CF/RF but it's not convenient right now.
+# 1B and CF are highest with 10 members a piece so they won't need filler players
 table(iBatRedsWandJ$POS)
 
 # columns needed: name_whole, redsWAR, redsWAR4, redsJAWS, POS
@@ -121,7 +125,7 @@ nPOS <- iBatRedsWandJ %>%
 # Number of filler players needed at each position
 neededPOS <- nPOS %>%
       mutate(remPOS = max(n) - n) %>%
-      filter(POS != "OF") %>%
+      filter(POS != "1B", POS != "CF") %>%
       select(-n)
 
 # Create list of lists of each position
