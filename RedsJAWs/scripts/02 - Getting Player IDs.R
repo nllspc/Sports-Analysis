@@ -15,6 +15,7 @@ idTTa <- idTT %>% select(key_bbref, key_fangraphs, name_last, name_first) %>%
   rename(playerId = key_bbref, fangraphs_id = key_fangraphs)
 
 # Taking column from other tibble and coercing into a list
+members <- read_rds("data/memberScrape.rds")
 inductees <- list(members[,"Inductee"])
 inductees <- inductees[[1]]
 

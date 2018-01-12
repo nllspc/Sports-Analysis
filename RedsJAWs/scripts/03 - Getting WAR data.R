@@ -47,22 +47,11 @@ nomWarDatT <- nomWarDat %>% group_by(playerId) %>%
 nomWarDatR <- filter(nomWarDatT, teamId == "CIN")
 
 # Lets make some files to save this progress
-write_rds(members, "data/memberScrape.rds")
-write_rds(indId, "data/inducteeIdsFinal.rds")
-write_rds(nomId, "data/nomineeIds.rds")
 write_rds(indWarDatT, "data/inducteeWARtotal.rds")
 write_rds(indWarDatR, "data/inducteeWARreds.rds")
 write_rds(nomWarDatT, "data/nomineeWARtotal.rds")
 write_rds(nomWarDatR, "data/nomineeWARreds.rds")
 
-# Load the files
-members <- read_rds("data/memberScrape.rds")
-nomId <- read_rds("data/nomineeIds.rds")
-indId <- read_rds("data/inducteeIdsFinal.rds")
-nomWarT <- read_rds("data/nomineeWARtotal.rds")
-nomWarR <- read_rds("data/nomineeWARreds.rds")
-indWarT <- read_rds("data/inducteeWARtotal.rds")
-indWarR <- read_rds("data/inducteeWARreds.rds")
 
 
 # Ready for some damn analysis

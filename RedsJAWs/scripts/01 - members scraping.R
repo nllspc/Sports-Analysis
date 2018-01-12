@@ -24,6 +24,7 @@ members <- url %>% read_html() %>% html_nodes(xpath='//*[@id="mw-content-text"]/
 members <- members[[1]]
 str(members)
 head(members)
+write_rds(members, "data/memberScrape.rds")
 
 ### Year is the year inducted into the Reds HOF. Tenure is years played as a Red.
 ### Tenure is formatted as a range and there are missing values in number.

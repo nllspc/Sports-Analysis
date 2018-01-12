@@ -14,8 +14,6 @@ nomWarT <- read_rds("data/nomineeWARtotal.rds")
 nomWarR <- read_rds("data/nomineeWARreds.rds")
 indWarT <- read_rds("data/inducteeWARtotal.rds")
 indWarR <- read_rds("data/inducteeWARreds.rds")
-warJaws <- read_rds("data/WARandJAWS.rds")
-redsWarJaws <- read_rds("data/redsWARandJAWS.rds")
 
 
 # Inductee War total without Craft who only had 6 yrs MLB service

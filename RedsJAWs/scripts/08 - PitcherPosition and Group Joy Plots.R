@@ -141,7 +141,7 @@ groupDistrbB <- groupDistrb %>%
 bothDistrb <- bind_rows(compPosDistrbB, groupDistrbB) %>% 
       mutate(POSf = as.factor(POS))
 
-write_rds(bothDistrb, "data/UnweightedandGroupJoyplot.rds")
+write_rds(bothDistrb, "data/unweightedandGroupJoyplot.rds")
 
 
 bothJoy <- ggplot(data = bothDistrb,
