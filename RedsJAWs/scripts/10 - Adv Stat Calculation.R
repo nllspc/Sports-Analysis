@@ -18,7 +18,9 @@ fFactors <- read_csv("C:/Users/Kevin/Documents/R/Data/Fangraphs/FanGraphsParkFac
 fHand <- read_csv("C:/Users/Kevin/Documents/R/Data/Fangraphs/FanGraphsHandedness.csv")
 # NL league Avgs for Pitching and Batting stats
 fPitAvgs <- read_csv("C:/Users/Kevin/Documents/R/Data/Fangraphs/FanGraphsNLPitAvgs.csv")
-fBatAvgs <- read_csv("C:/Users/Kevin/Documents/R/Data/Fangraphs/FanGraphsNLBatAvgs.csv")
+fnBatAvgs <- read_csv("C:/Users/Kevin/Documents/R/Data/Fangraphs/FanGraphsNLBatAvgs.csv")
+# MLB League Averages for Batting stats
+fBatAvgs <- read_csv("C:/Users/Kevin/Documents/R/Data/Fangraphs/FanGraphs Batting Averages.csv")
 
 
 iRedsWar <- read_rds("data/03 - inducteeWARreds.rds") %>% 
@@ -47,6 +49,20 @@ nBatAvgs <- map_dfr(nRedsWar$yearId, function(x) {
       select(playerId, yearId, everything())
 inBatAvgs <- iBatAvgs %>% 
       bind_rows(nBatAvgs)
+
+iNLBatAvgs <- map_dfr(iRedsWar$yearId, function(x) {
+      filter(fnBatAvgs, Season == x)
+}) %>% 
+      bind_cols(iRedsWar) %>% 
+      select(playerId, yearId, everything())
+
+nNLBatAvgs <- map_dfr(nRedsWar$yearId, function(x) {
+      filter(fnBatAvgs, Season == x)
+}) %>% 
+      bind_cols(nRedsWar) %>% 
+      select(playerId, yearId, everything())
+inNLBatAvgs <- iNLBatAvgs %>% 
+      bind_rows(nNLBatAvgs)
 
 
 iPitAvgs <- map_dfr(iRedsWar$yearId, function(x) {
@@ -279,7 +295,7 @@ inRedsBatStats <- map2_dfr(inRedsYrsBat$playerId, inRedsYrsBat$yearId, function(
 })
 inRedsBatStats <- inRedsBatStats %>% 
       rename(playerId = playerID, yearId = yearID) %>%
-      mutate(one_B = H - (X2B + X3B + HR))
+      mutate(one_B = H - (X2B + X3B + HR), uBB = BB - IBB)
 
 write_rds(inRedsBatStats, "data/inRedsBatStats.rds")
 
@@ -288,40 +304,6 @@ write_rds(inRedsBatStats, "data/inRedsBatStats.rds")
 
 inRedsBatStats <- read_rds("data/inRedsBatStats.rds")
 
-
-
-benchBatAdv <- seasRedsBatAdv %>% 
-      filter(playerId == "benchjo01" & yearId == "1969")
-benchFactor <- inFactors %>% 
-      filter(playerId == "benchjo01" & yearId == "1969")
-benchAvg <- inBatAvgs %>%
-      filter(playerId == "benchjo01" & yearId == "1969")
-benchStat <- inRedsBatStats %>% 
-      filter(playerId == "benchjo01" & yearId == "1969")
-benchCon <- inConstants %>% 
-      filter(playerId == "benchjo01" & yearId == "1969")
-woba <- ((wBB*BB)+(wHBP*HBP)+(w1B*one_B)+(w2B*X2B)+(w3B*X3B)+(wHR*HR))/(AB+BB-IBB+SF+HBP)
-
-#  Bench 1969 wOBA
-#  0.382 using constants pulled from website, 0.373 listed at website
-#  ((wBB*BB)+(wHBP*HBP)+(w1B*one_B)+(w2B*X2B)+(w3B*X3B)+(wHR*HR))/(AB+BB-IBB+SF+HBP)
-#  ((0.705*49) + (0.739*4) + (0.913*106) + (1.316*23) + (1.679*1) + (2.195*26)) / (532+49-7+7+4)
-# 
-#  Bench 1969 wRAA
-#  22.02 using website's wOBA 0.373, 25.9 using my wOBA 0.382, wRAA of 26.4 listed at website
-#  ((wOBA_val-lgwOBA)/wOBAScale)*PA
-#  ((0.373 - 0.323) / 1.344) * 592
-# 
-#  Bench 1969 wRC+ using website's 26.4 wRAA
-#  126 using website's wRAA 26.4, 125 using my wRAA, 126 wRC+ listed at website
-# ((((26.4 / 592) + 0.107) + (0.107 - ((107/100) * 0.107))) / (7822 / 68383)) * 100
-# 
-#  While this one is close, the rest are not. 1970 - 1975 - mine: 141, 106, 163, 122, 148, 145; FG's: 144, 106, 156, 115, 142, 140
-
-
-# Example on wRC+ webpage, works
-# ((((wRAA_val/PA) + r_per_PA) + (r_per_PA - (pF *r_per_PA)))/(lgwRC/lgPA))*100
-((((48.2 / 639) + 0.114) + (0.114 - (0.95 * 0.114))) / (10032 / 85797)) * 100
 
 # wOBA
 woba <- function(player, year) {
@@ -337,6 +319,7 @@ woba <- function(player, year) {
       AB <- obaStat$AB[1]
       IBB <- obaStat$IBB[1]
       SF <- obaStat$SF[1]
+      uBB <- obaStat$uBB[1]
 
       obaCon <- inConstants %>%
             filter(playerId == !!player & yearId == !!year)
@@ -347,7 +330,7 @@ woba <- function(player, year) {
       w3B <- obaCon$w3B[1]
       wHR <- obaCon$wHR[1]
 
-      woba <- ((wBB*BB)+(wHBP*HBP)+(w1B*one_B)+(w2B*X2B)+(w3B*X3B)+(wHR*HR))/(AB+BB-IBB+SF+HBP)
+      woba <- ((wBB*uBB)+(wHBP*HBP)+(w1B*one_B)+(w2B*X2B)+(w3B*X3B)+(wHR*HR))/(AB+BB-IBB+SF+HBP)
 
 }
 
@@ -381,16 +364,16 @@ wrcplus <- function(wRAA_val, player, year) {
             filter(playerId == !!player & yearId == !!year)
       r_per_PA <- rcCon$R_per_PA[1]
       
-      rcAvg <- inBatAvgs %>% 
+      rcAvg <- inNLBatAvgs %>% 
             filter(playerId == !!player & yearId == !!year)
-      lgwRC <- rcAvg$wRC[1]
-      lgPA <- rcAvg$PA[1]
+      NLwRC <- rcAvg$wRC[1]
+      NLPA <- rcAvg$PA[1]
       
       rcFactor <- inFactors %>% 
             filter(playerId == !!player & yearId == !!year)
       pF <- rcFactor$Basic[1]
       
-      wrcplus <- ((((wRAA_val / PA) + r_per_PA) + (r_per_PA - ((pF/100) * r_per_PA))) / (lgwRC/lgPA)) * 100
+      wrcplus <- ((((wRAA_val / PA) + r_per_PA) + (r_per_PA - ((pF/100) * r_per_PA))) / (NLwRC/NLPA)) * 100
 }
 
 tempTibBat <- tibble(
