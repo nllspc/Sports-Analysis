@@ -7,8 +7,8 @@ library(openWARData)
 library(Lahman)
 
 
-redsWarJaws <- read_rds("data/indRedsWARandJAWS.rds")
-indWarR <- read_rds("data/inducteeWARreds.rds")
+redsWarJaws <- read_rds("data/05 - indRedsWARandJAWS.rds")
+indWarR <- read_rds("data/03 - inducteeWARreds.rds")
 
 
 # Making id, years lists for map functions
@@ -45,16 +45,13 @@ redsWarJaws <- redsWarJaws %>% select(-POS) %>%
       select(playerId, fangraphs_id, name_whole, totalYrs, redsWAR, redsPeakWAR, redsWAR4, redsJAWS, POS, name_first, name_last) %>% 
       rename(tenure = totalYrs)
 
-# Reordering columns and renaming totalYrs to tenure because I think it's more accurate.
-redsWarJaws <- redsWarJaws 
-
-write_rds(redsWarJaws, "data/indRedsWARandJAWS.rds")
+write_rds(redsWarJaws, "data/05 06 - indRedsWARandJAWS.rds")
 
 
 # Nominees=======================================
 
-nomWarR <- read_rds("data/nomineeWARreds.rds")
-nRedsWarJaws <- read_rds("data/nomRedsWARandJAWS.rds")
+nomWarR <- read_rds("data/03 - nomineeWARreds.rds")
+nRedsWarJaws <- read_rds("data/05 - nomRedsWARandJAWS.rds")
 
 
 # Making lists for map functions
@@ -83,5 +80,5 @@ nRedsWarJaws <- nRedsWarJaws %>% select(-POS) %>%
       select(playerId, fangraphs_id, name_whole, tenure, redsWAR, redsPeakWAR, redsWAR4, redsJAWS, POS, name_first, name_last)
 
 
-write_rds(nRedsWarJaws, "data/nomRedsWARandJAWS.rds")
+write_rds(nRedsWarJaws, "data/05 06 - nomRedsWARandJAWS.rds")
 

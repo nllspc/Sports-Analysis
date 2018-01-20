@@ -5,8 +5,8 @@ library(tidyverse)
 library(Lahman)
 
 
-iRedsWandJ <- read_rds("data/indRedsWARandJAWS.rds")
-iRedsYrs <- read_rds("data/inducteeWARreds.rds")
+iRedsWandJ <- read_rds("data/05 06 - indRedsWARandJAWS.rds")
+iRedsYrs <- read_rds("data/03 - inducteeWARreds.rds")
 # Seeing how many OF'ers I have.
 table(iRedsWandJ$POS)
 
@@ -29,10 +29,12 @@ yrsList <- list(ofYears$yearId)
 yrsList <- yrsList[[1]]
 
 # Getting number of games played at each OF position for each season
+
 ofFilter <- function(x,y) {
-      filter(Appearances, playerID == x, yearID == y)
+      filter(Appearances, playerID == x & yearID == y)
 }
 ofSplit <- map2_dfr(idList2, yrsList, ofFilter)
+
 ofSplit_gathered <- gather(ofSplit, 'G_lf', 'G_cf', 'G_rf', key = "of_pos", value = "G")
 
 # For each player, summing number of games played at each position for entire Reds tenure and getting the most played position.
@@ -144,8 +146,8 @@ write_rds(group_Summary, "data/otherGroupSummary.rds")
 
 # Copied errything from the inductee code section and either replaced the "i" for inductee with an "n" or added an "n".
 
-nRedsWandJ <- read_rds("data/nomRedsWARandJAWS.rds")
-nRedsYrs <- read_rds("data/nomineeWARreds.rds")
+nRedsWandJ <- read_rds("data/05 06 - nomRedsWARandJAWS.rds")
+nRedsYrs <- read_rds("data/03 - nomineeWARreds.rds")
 
 # Subsetting df with players with position = outfielder
 nof <- nRedsWandJ %>% 
@@ -166,8 +168,9 @@ nyrsList <- list(nofYears$yearId)
 nyrsList <- nyrsList[[1]]
 
 # Getting number of games played at each OF position for each season
+
 nofFilter <- function(x,y) {
-      filter(Appearances, playerID == x, yearID == y)
+      filter(Appearances, playerID == x & yearID == y)
 }
 nofSplit <- map2_dfr(nidList2, nyrsList, nofFilter)
 nofSplit_gathered <- gather(nofSplit, 'G_lf', 'G_cf', 'G_rf', key = "of_pos", value = "G")

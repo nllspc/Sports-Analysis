@@ -5,7 +5,8 @@
 
 library(tidyverse)
 
-iRedsWandJ <- read_rds("data/indRedsWARandJAWS.rds")
+# Originally just had "OF" and decided later to split the outfielder position into LF, CF, RF which is what happens in 07b
+iRedsWandJ <- read_rds("data/05 06 07b - indRedsWARandJAWS.rds")
 
 # When we compare nominees we'll compare pitchers to pitchers and regular position players to regular position players
 iPitRedsWandJ <- iRedsWandJ %>% 

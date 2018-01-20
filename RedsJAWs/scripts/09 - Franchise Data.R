@@ -8,7 +8,7 @@ library(tidyverse)
 
 # Batting =======================================
 
-redsFranBat <- read_csv("C:/Users/Kevin/Documents/R/Data/BBRef Reds/redsFranchiseBattingJan2018.csv")
+redsFranBat <- read_csv("./redsFranchiseBattingJan2018.csv")
 
 
 # Splitting Name column into name_whole and playerId. Removing "HOF" from name_whole players who are in MLB HOF.
@@ -34,14 +34,14 @@ redsFranBat <- redsFranBat %>%
       filter(PA > 1499) %>% 
       bind_rows(fewAB)
 
-write_rds(redsFranBat, "data/redsFranchiseBatting.rds")
+write_rds(redsFranBat, "data/09 - redsFranchiseBatting.rds")
 
 
 
 # Pitching =====================================
 
 
-redsFranPit <- read_csv("C:/Users/Kevin/Documents/R/Data/BBRef Reds/redsFranchisePitchingJan2018.csv")
+redsFranPit <- read_csv("./redsFranchisePitchingJan2018.csv")
 
 
 # Same as with Batting
@@ -74,6 +74,6 @@ inRedsFranPit <- map_dfr(inRedsWandJp$playerId, function(x) {redsFranPit %>% fil
 redsFranPit <- redsFranPit %>% 
       filter(IP > 499)
 
-write_rds(redsFranPit, "data/redsFranchisePitching.rds")
+write_rds(redsFranPit, "data/09 - redsFranchisePitching.rds")
 
 

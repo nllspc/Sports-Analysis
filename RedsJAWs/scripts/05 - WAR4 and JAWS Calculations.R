@@ -8,12 +8,12 @@ library(tidyverse)
 library(openWARData)
 library(Lahman)
 
-nomId <- read_rds("data/nomineeIds.rds")
-indId <- read_rds("data/inducteeIdsFinal.rds")
-nomWarT <- read_rds("data/nomineeWARtotal.rds")
-nomWarR <- read_rds("data/nomineeWARreds.rds")
-indWarT <- read_rds("data/inducteeWARtotal.rds")
-indWarR <- read_rds("data/inducteeWARreds.rds")
+nomId <- read_rds("data/02 - nomineeIds.rds")
+indId <- read_rds("data/02 - inducteeIdsFinal.rds")
+nomWarT <- read_rds("data/03 - nomineeWARtotal.rds")
+nomWarR <- read_rds("data/03 - nomineeWARreds.rds")
+indWarT <- read_rds("data/03 - inducteeWARtotal.rds")
+indWarR <- read_rds("data/03 - inducteeWARreds.rds")
 
 
 # Inductee War total without Craft who only had 6 yrs MLB service
@@ -78,15 +78,12 @@ yearTotR <- indWarR %>%
 redsWarJaws <- redsWarJaws %>% add_column(totalYrs = yearTotR$sumYr)
 redsWarJaws <- redsWarJaws %>% select(playerId, fangraphs_id, name_whole, POS, totalYrs, redsWAR, redsPeakWAR, redsWAR4, redsJAWS, name_first, name_last)
 
-write_rds(redsWarJaws, "data/indRedsWARandJAWS.rds")
+write_rds(redsWarJaws, "data/05 - indRedsWARandJAWS.rds")
 
 
 
 # Nominees=========================================================
 
-
-nomWarT <- read_rds("data/nomineeWARtotal.rds")
-nomWarR <- read_rds("data/nomineeWARreds.rds")
 
 # Career WAR
 nCarWardat <- nomWarT %>%
@@ -145,4 +142,4 @@ nYearTotR <- nomWarR %>%
 nRedsWarJaws <- nRedsWarJaws %>% add_column(tenure = nYearTotR$sumYr)
 nRedsWarJaws <- nRedsWarJaws %>% select(playerId, fangraphs_id, name_whole, POS, tenure, redsWAR, redsPeakWAR, redsWAR4, redsJAWS, name_first, name_last)
 
-write_rds(nRedsWarJaws, "data/nomRedsWARandJAWS.rds")
+write_rds(nRedsWarJaws, "data/05 - nomRedsWARandJAWS.rds")

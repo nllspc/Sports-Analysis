@@ -5,7 +5,7 @@
 
 library(tidyverse)
 library(Lahman)
-library(rlang)
+
 
 inRedsBatStats <- read_rds("data/10 - inRedsBatStats.rds")
 inRedsPitStats <- read_rds("data/10 - inRedsPitStats.rds")
@@ -32,7 +32,7 @@ yearPitList <- yearPitList[[1]]
 
 postBat_data <- battingStats(data = Lahman::BattingPost)
 filter_BatPost <- function(x, y) {
-      filter(postBat_data, playerID == x, yearID == y)
+      filter(postBat_data, playerID == x & yearID == y)
 }
 inRedsBatPost <- map2_dfr(playerBatList, yearBatList, filter_BatPost) %>% filter(teamID == "CIN")
 
@@ -40,9 +40,10 @@ inRedsBatPost <- map2_dfr(playerBatList, yearBatList, filter_BatPost) %>% filter
 # Pitching
 
 filter_PitPost <- function(x, y) {
-      filter(PitchingPost, playerID == x, yearID == y)
+      filter(PitchingPost, playerID == x & yearID == y)
 }
-inRedsPitPost <- map2_dfr(playerPitList, yearPitList, filter_PitPost)
+inRedsPitPost <- map2_dfr(playerPitList, yearPitList, filter_PitPost) %>% 
+      filter(teamID == "CIN")
 
 
 
@@ -112,11 +113,12 @@ write_rds(sum_postPitStats, "data/11 - careerRedsPostseasonPit.rds")
 # Batting
 
 filter_BatAwa <- function(x, y) {
-      filter(AwardsPlayers, playerID == x, yearID == y)
+      filter(AwardsPlayers, playerID == x & yearID == y)
 }
 inRedsBatAwa <- map2_dfr(playerBatList, yearBatList, filter_BatAwa) %>% 
       select(playerID, yearID, awardID)
-      
+
+# Number of times each player has won each award      
 sum_BatAwa <- inRedsBatAwa %>% 
       select(playerID, awardID) %>% 
       group_by(playerID, awardID) %>% 
@@ -128,7 +130,7 @@ write_rds(sum_BatAwa, "data/11 - summaryBattingAwards.rds")
 # Pitching
 
 filter_PitAwa <- function(x, y) {
-      filter(AwardsPlayers, playerID == x, yearID == y)
+      filter(AwardsPlayers, playerID == x & yearID == y)
 }
 inRedsPitAwa <- map2_dfr(playerPitList, yearPitList, filter_PitAwa) %>% 
       select(playerID, yearID, awardID)
@@ -144,34 +146,53 @@ write_rds(sum_PitAwa, "data/11 - summaryPitchingAwards.rds")
 
 # Award Shares =================================================
 
+# Interested in the near misses since even placing 2nd or 3rd indicates a really good season in relation to peers
+
 # Batting
 
+# Contains ROY and MVP vote shares
 filter_BatSha <- function(x, y) {
-      filter(AwardsSharePlayers, playerID == x, yearID == y)
+      filter(AwardsSharePlayers, playerID == x & yearID == y)
 }
 inRedsBatSha <- map2_dfr(playerBatList, yearBatList, filter_BatSha) %>% 
-      mutate(vote_percentage = round((pointsWon/pointsMax)*100, 0))
-
-
-# Pitching
-
-filter_PitSha <- function(x, y) {
-      filter(AwardsSharePlayers, playerID == x, yearID == y)
-}
-inRedsPitSha <- map2_dfr(playerPitList, yearPitList, filter_PitSha) %>% 
       mutate(vote_percentage = round((pointsWon/pointsMax)*100, 0))
 
 mvp_roy_bat <- inRedsBatAwa %>% 
       filter(awardID == "Most Valuable Player" | awardID == "Rookie of the Year") %>% 
       select(playerID, yearID)
 
-mrList_player <- list(mvp_roy_bat$playerID)
-mrList_player <- mrList_player[[1]]
-mrList_year <- list(mvp_roy_bat$yearID)
-mrList_year <- mrList_year[[1]]
+# This gets me the votes shares of awards that players didn't win
+inRedsBatSha2 <- anti_join(inRedsBatSha, mvp_roy_bat, by = c("playerID", "yearID"))
+
+# need to add rows back: 1968 Bench MVP, 1956 Robinson MVP
+rows_to_add <- setdiff(inRedsBatSha, inRedsBatSha2) %>% 
+      filter(yearID == "1968" & awardID == "MVP" | yearID == "1956" & awardID == "MVP")
+
+# This contains the vote percentages/shares of awards players didn't win
+inRedsBatSha2 <- inRedsBatSha2 %>% 
+      bind_rows(rows_to_add)
+
+write_rds(inRedsBatSha2, "data/11 - battingAwardsVoteShares.rds")
 
 
 
-no_win_BatShares <- map2_dfr(mrList_player, mrList_year, function(x, y) {filter(inRedsBatSha, playerID == x & yearID == y)})   
+
+# Pitching
+
+# Shares for CY, ROY, and MVP
+filter_PitSha <- function(x, y) {
+      filter(AwardsSharePlayers, playerID == x & yearID == y)
+}
+inRedsPitSha <- map2_dfr(playerPitList, yearPitList, filter_PitSha) %>% 
+      mutate(vote_percentage = round((pointsWon/pointsMax)*100, 0))
+
+mvp_roy_cy_pit <- inRedsPitAwa %>% 
+      filter(awardID == "Most Valuable Player" | awardID == "Rookie of the Year" |awardID == "Cy Young Award") %>% 
+      select(playerID, yearID)
+
+# This gets me the vote percentages/shares of awards that players didn't win
+inRedsPitSha2 <- anti_join(inRedsPitSha, mvp_roy_cy_pit, by = c("playerID", "yearID"))
+
+write_rds(inRedsPitSha2, "data/11 - pitchingAwardsVoteShares.rds")
       
 
