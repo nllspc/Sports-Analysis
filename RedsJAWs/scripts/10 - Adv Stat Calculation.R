@@ -11,16 +11,16 @@ library(Lahman)
 library(rlang)
 
 # Various constants
-fConstants <- read_csv("./FanGraphsConstants.csv")
+fConstants <- read_csv("./10 - FanGraphsConstants.csv")
 # Park Factors
-fFactors <- read_csv("./FanGraphsParkFactors.csv")
+fFactors <- read_csv("./10 - FanGraphsParkFactors.csv")
 # Handedness Park Factors (don't end up needing them)
-fHand <- read_csv("./FanGraphsHandedness.csv")
+fHand <- read_csv("./10 - FanGraphsHandedness.csv")
 # NL league Avgs for Pitching and Batting stats
-fPitAvgs <- read_csv("./FanGraphsNLPitAvgs.csv")
-fnBatAvgs <- read_csv("./FanGraphsNLBatAvgs.csv")
+fPitAvgs <- read_csv("./10 - FanGraphsNLPitAvgs.csv")
+fnBatAvgs <- read_csv("./10 - FanGraphsNLBatAvgs.csv")
 # MLB League Averages for Batting stats
-fBatAvgs <- read_csv("./FanGraphs Batting Averages.csv")
+fBatAvgs <- read_csv("./10 - FanGraphsMLBBatAvgs.csv")
 
 
 iRedsWar <- read_rds("data/03 - inducteeWARreds.rds") %>% 
