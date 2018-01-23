@@ -1,5 +1,5 @@
 # Adv Stat Calculation
-# Sections: Create Constants tibbles, Pitching(gather stats, calculation), Batting(gather stats, calculation)
+# Sections: Create Constants tibbles, Pitching(gather stats, calculation), Batting(gather stats, calculation), Fielding
 # Note: Links to averages, factors, and constants (aka 'guts') can be found on the fangraphs glossary pages for each of the adv stats calc'd
 
 
@@ -182,10 +182,10 @@ redsYrsPit <- map_dfr(iRedsWandJ$playerId, function(x) {
 redsPitStats <- map2_dfr(redsYrsPit$playerId, redsYrsPit$yearId, function(x, y) {
       filter(Pitching, playerID == x & yearID == y) %>% 
             mutate(IP = IPouts/3) %>% 
-            select(playerID, yearID, H, HR, BB, HBP, SO, IP)
+            select(playerID, teamID, yearID, H, HR, BB, HBP, SO, IP)
 })
 
-# Something is up with Jim O'Toole's ID. Pitching db in Lahman has otoolji01 while openWARdat doesn't have the "l" but has "'". Don't know if it's me or them. Think it's them though. Need to double-check in openWARdat and then the bbref site figure out which one is real.
+# Something is up with Jim O'Toole's ID. Pitching db in Lahman has otoolji01 while openWARdat doesn't have the "l" but has "'". openWARdat has the correct id for the bbref site. So that's need changed at my earliest convenience.
 otoole <- Pitching %>%
       filter(playerID == "otoolji01" & teamID == "CIN") %>%
       mutate(IP = IPouts/3) %>%
@@ -205,12 +205,14 @@ nRedsYrsPit <- map_dfr(nRedsWandJ$playerId, function(x) {
 nRedsPitStats <- map2_dfr(nRedsYrsPit$playerId, nRedsYrsPit$yearId, function(x, y) {
       filter(Pitching, playerID == x & yearID == y) %>% 
             mutate(IP = IPouts/3) %>% 
-            select(playerID, yearID, H, HR, BB, HBP, SO, IP)
+            select(playerID, teamID, yearID, H, HR, BB, HBP, SO, IP)
 })
 
 inRedsPitStats <- redsPitStats %>% 
       bind_rows(nRedsPitStats) %>% 
-      rename(playerId = playerID, yearId = yearID)
+      filter(teamID == "CIN") %>% 
+      rename(playerId = playerID, yearId = yearID) %>% 
+      select(-teamID)
 
 write_rds(inRedsPitStats, "data/10 - inRedsPitStats.rds")
 
@@ -299,19 +301,10 @@ seasRedsPitAdv <- map2_dfr(playerPitList, yearPitList, fillAdv)
 
 missPitAdv <- naniar::miss_var_summary(seasRedsPitAdv)
 
+seasRedsPitAdv <- seasRedsPitAdv %>% 
+      rename(`K/BB` = K_per_BB, `K/9` = K_per_nine, `FIP-` = FIP_minus)
+
 write_rds(seasRedsPitAdv, "data/seasAdvancedPitStats.rds")
-
-
-tenRedsPitAdv <- seasRedsPitAdv %>%
-      select(-yearId) %>% 
-      group_by(playerId) %>% 
-      summarize(reds_K_per_BB = round(mean(K_per_BB), 2),
-             reds_K_per_nine = round(mean(K_per_nine), 2),
-             reds_WHIP = round(mean(WHIP), 2),
-             reds_FIP_minus = round(mean(FIP_minus), 0)
-      )
-
-write_rds(tenRedsPitAdv, "data/tenAdvancedPitStats.rds")
 
 
 
@@ -346,7 +339,8 @@ inRedsBatStats <- map2_dfr(inRedsYrsBat$playerId, inRedsYrsBat$yearId, function(
 })
 inRedsBatStats <- inRedsBatStats %>% 
       rename(playerId = playerID, yearId = yearID) %>%
-      mutate(one_B = H - (X2B + X3B + HR), uBB = BB - IBB)
+      mutate(one_B = H - (X2B + X3B + HR), uBB = BB - IBB) %>% 
+      filter(teamID == "CIN")
 
 write_rds(inRedsBatStats, "data/10 - inRedsBatStats.rds")
 
@@ -450,6 +444,9 @@ yearBatList <- yearBatList[[1]]
 
 seasRedsBatAdv <- map2_dfr(playerBatList, yearBatList, fillBatAdv)
 
+seasRedsBatAdv <- seasRedsBatAdv %>% 
+      rename(`wRC+` = wRC_plus)
+
 missBatAdv <- naniar::miss_var_summary(seasRedsBatAdv)
 
 
@@ -457,6 +454,45 @@ write_rds(seasRedsBatAdv, "data/seasAdvancedBatStats.rds")
 
 
 
+# Fielding ==============================================
 
 
 
+# Filtering nominee and inductee dfs for batters and their playerIds
+iRedsWandJ <- read_rds("data/05 06 07b - indRedsWARandJAWS.rds")
+nRedsWandJ <- read_rds("data/05 06 07b - nomRedsWARandJAWS.rds")
+iRedsWandJb <- iRedsWandJ %>% 
+      filter(POS != "P")
+nRedsWandJb <- nRedsWandJ %>% 
+      filter(POS != "P")
+inRedsWandJb <- iRedsWandJb %>%
+      bind_rows(nRedsWandJb)
+
+# No idea why but couldn't get four players to be exported with the data unless I specified only outfielders. Weird.
+fg_ofStats <- read_csv("data/10 - FanGraphs OF Std Fielding.csv")
+# Adv. fielding stats only available from 2002 onward
+fg_defStats <- read_csv("data/10 - FanGraphs DRS, TZL, UZR, DEF.csv")
+fg_tz <- read_csv("data/10 - FanGraphs TZ.csv")
+
+fg_ofStats_trunc <- fg_ofStats %>% 
+      filter(Name == "Dummy Hoy" | Name == "Mike McCormick" | Name == "Ival Goodman" | Name == "Sam Crawford")
+
+fg_defStats_trunc <- map_dfr(inRedsWandJb$name_whole, function(x) {filter(fg_defStats, Name == x)}) %>% 
+      select(playerid, Pos, Inn, DRS, TZL, UZR, Def)
+
+fg_tz_trunc <- map_dfr(inRedsWandJb$name_whole, function(x) {filter(fg_tz, Name == x)}) %>% 
+      bind_rows(fg_ofStats_trunc) %>% 
+      select(playerid, Name, Pos, G, GS, TZ)
+
+# Got'em all
+missing_fielders <- setdiff(fg_tz_trunc$Name, inRedsWandJb$name_whole)
+missing_fielders2 <- setdiff(inRedsWandJb$name_whole, fg_tz_trunc$Name)
+
+fg_fielding <- fg_tz_trunc %>% 
+      full_join(fg_defStats_trunc, by = c("playerid", "Pos"))
+
+# Still good
+missing_fielders3 <- setdiff(inRedsWandJb$name_whole, fg_fielding$Name)
+
+
+write_rds(fg_fielding, "data/10 - careerAdvancedFieldingStats.rds")

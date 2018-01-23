@@ -29,6 +29,20 @@ redsFranBat <- redsFranBat %>%
       add_column(name_whole) %>% 
       select(playerId, name_whole, everything())
 
+
+# Filtering nominee and inductee dfs for batters and their playerIds
+iRedsWandJ <- read_rds("data/05 06 07b - indRedsWARandJAWS.rds")
+nRedsWandJ <- read_rds("data/05 06 07b - nomRedsWARandJAWS.rds")
+iRedsWandJb <- iRedsWandJ %>% 
+      filter(POS != "P")
+nRedsWandJb <- nRedsWandJ %>% 
+      filter(POS != "P")
+inRedsWandJb <- iRedsWandJb %>%
+      bind_rows(nRedsWandJb)
+
+# Using those playerIds to filter Francise df to see if any pitchers fall below the 500 IP threshold for rate stat qualification. Everybody made it.
+inRedsFranPit <- map_dfr(inRedsWandJb$playerId, function(x) {redsFranBat %>% filter(playerId == x)})
+
 # Position players that are below the 1500 PA threshold used to qualify for rate statistic ranking yet are in Reds HOF or are a nominee. Assuming top ranked players in counting stats have enough PAs.
 fewAB <- redsFranBat %>% 
       filter(name_whole == "Scott Rolen" | name_whole == "Mike McCormick")
@@ -43,10 +57,12 @@ bbrefFranBat <- redsFranBat %>%
 
 # Clean as a whistle and I've already filtered for 1500 PA at the website
 fgFranBat_dat <- read_csv("./09 - FanGraphs Franchise Batting.csv")
+
 rolen <- read_csv("./09 - FanGraphs Rolen.csv") %>% 
       filter(Name == "Scott Rolen")
 mcc <- read_csv("./09 - FanGraphs McCormick.csv") %>% 
       filter(Name == "Mike McCormick")
+
 left_out <- rolen %>% 
       bind_rows(mcc)
 fgFranBat <- fgFranBat_dat %>% 
@@ -55,7 +71,7 @@ fgFranBat <- fgFranBat_dat %>%
       rename(fg_playerId = playerid)
 
 
-# Combine Advanced Stats
+# Combine Stats
 
 # "Dick Hoblitzel" (2 end "l"s in bbref and others) "Ken Griffey Jr." (no Jr) "Elmer Smith" (fg has 2 Elmer Smiths but bbref and others call him, Mike.) "Eddie Taubensee" (bbref calls him Ed) "George Kelly" (High Pockets Kelly in bbref and yeah, that's the one we're using)
 missing_players <- setdiff(fgFranBat$Name, bbrefFranBat$name_whole)
@@ -107,7 +123,7 @@ write_rds(tradFranBat, "data/09 - franchiseTradBatting.rds")
 
 # BBRef
 
-redsFranPit <- read_csv("data/09 - bbref Franchise Pitching.csv")
+redsFranPit <- read_csv("./09 - bbref Franchise Pitching.csv")
 
 
 # Same as with Batting
@@ -143,12 +159,10 @@ bbrefFranPit <- redsFranPit %>%
       filter(IP > 499) %>% 
       mutate(name_whole = as.character(name_whole))
 
-write_rds(bbrefFranPit, "data/09 - bbrefFranchisePitching.rds")
-
 
 # FanGraphs
 
-fgFranPit_dat <- read_csv("data/09 - FanGraphs Franchise Pitching.csv")
+fgFranPit_dat <- read_csv("./09 - FanGraphs Franchise Pitching.csv")
 
 # Some naming conflicts but no one is left out
 missing_pitchers <- setdiff(bbrefFranPit$name_whole, fgFranPit_dat$Name)
@@ -157,4 +171,37 @@ missing_pitchers2 <- setdiff(fgFranPit_dat$Name, bbrefFranPit$name_whole)
 fgFranPit <- fgFranPit_dat %>% 
       mutate(Name = if_else(Name == "Elmer Smith", "Mike Smith", Name), Name = if_else(Name == "Junior Thompson", "Gene Thompson", Name), Name = if_else(Name == "Elton Chamberlain", "Ice Box Chamberlain", Name))
 
-write_rds(fgFranPit, "data/09 - fgFranchisePitching.rds")
+# Good to go
+missing_pitchers3 <- setdiff(bbrefFranPit$name_whole, fgFranPit$Name)
+missing_pitchers4 <- setdiff(fgFranPit$Name, bbrefFranPit$name_whole)
+
+
+# Combine Stats
+
+# Swapping, copying, and discarding columns
+
+era_plus <- bbrefFranPit %>% 
+      select(name_whole, playerId, Yrs, To, From, `ERA+`)
+
+fgID <- fgFranPit %>%
+      select(playerid, Name)
+
+tradFranPit <- bbrefFranPit %>% 
+      select(playerId, name_whole, Yrs, From, To, W, L, `W-L%`, ERA, G, GS, CG, SHO, SV, IP, SO) %>% 
+      inner_join(fgID, by = c("name_whole" = "Name")) %>% 
+      rename(bbref_id = playerId, fg_id = playerid) %>% 
+      mutate(`W-L%` = round(`W-L%` * 100, 0)) %>% 
+      select(bbref_id, fg_id, everything())
+
+advFranPit <- fgFranPit %>% 
+      select(-`E-F`, -xFIP, -ERA, -`LOB%`, -BABIP, -FIP) %>% 
+      inner_join(era_plus, by = c("Name" = "name_whole")) %>% 
+      rename(bbref_id = playerId, fg_id = playerid) %>%
+      select(bbref_id, fg_id, Name, Yrs, From, To, `ERA-`, `FIP-`, `xFIP-`, `ERA+`, WHIP, SIERA, everything())
+
+
+write_rds(tradFranPit, "data/09 - tradFranchisePitching.rds")
+write_rds(advFranPit, "data/09 - advFranchisePitching.rds")
+
+
+
