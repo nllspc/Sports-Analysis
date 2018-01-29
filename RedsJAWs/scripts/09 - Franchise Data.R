@@ -10,7 +10,7 @@ library(tidyverse)
 
 # BBRef
 
-redsFranBat <- read_csv("./09 - BBRef Franchise Batting.csv")
+redsFranBat <- read_csv("data/09 - BBRef Franchise Batting.csv")
 
 
 
@@ -40,35 +40,46 @@ nRedsWandJb <- nRedsWandJ %>%
 inRedsWandJb <- iRedsWandJb %>%
       bind_rows(nRedsWandJb)
 
-# Using those playerIds to filter Francise df to see if any pitchers fall below the 500 IP threshold for rate stat qualification. Everybody made it.
-inRedsFranPit <- map_dfr(inRedsWandJb$playerId, function(x) {redsFranBat %>% filter(playerId == x)})
+# Using those playerIds to filter Franchise df to see if any batters fall below the 1500 PA threshold for rate stat qualification. Rolen, Mac, Smoky not enough.
+inRedsFranBat <- map_dfr(inRedsWandJb$playerId, function(x) {redsFranBat %>% filter(playerId == x)})
 
 # Position players that are below the 1500 PA threshold used to qualify for rate statistic ranking yet are in Reds HOF or are a nominee. Assuming top ranked players in counting stats have enough PAs.
 fewAB <- redsFranBat %>% 
-      filter(name_whole == "Scott Rolen" | name_whole == "Mike McCormick")
+      filter(name_whole == "Scott Rolen" | name_whole == "Mike McCormick" | name_whole == "Smoky Burgess")
 
 bbrefFranBat <- redsFranBat %>% 
       filter(PA > 1499) %>% 
       bind_rows(fewAB) %>% 
       rename(bbref_playerId = playerId)
 
+# complete
+missing_bbref <- setdiff(inRedsWandJb$playerId, bbrefFranBat$bbref_playerId)
+
 
 # Fangraphs
 
 # Clean as a whistle and I've already filtered for 1500 PA at the website
-fgFranBat_dat <- read_csv("./09 - FanGraphs Franchise Batting.csv")
+fgFranBat_dat <- read_csv("data/09 - FanGraphs Franchise Batting.csv")
 
-rolen <- read_csv("./09 - FanGraphs Rolen.csv") %>% 
+rolen <- read_csv("data/09 - FanGraphs Rolen.csv") %>% 
       filter(Name == "Scott Rolen")
-mcc <- read_csv("./09 - FanGraphs McCormick.csv") %>% 
+mcc <- read_csv("data/09 - FanGraphs McCormick.csv") %>% 
       filter(Name == "Mike McCormick")
+smk <- read.csv("data/09 - FanGraphs Burgess.csv") %>% 
+      rename(Name = ï..Name) %>% 
+      mutate(Name = as.character(Name)) %>% 
+      filter(Name == "Smoky Burgess")
 
 left_out <- rolen %>% 
-      bind_rows(mcc)
+      bind_rows(mcc) %>% 
+      bind_rows(smk)
 fgFranBat <- fgFranBat_dat %>% 
       bind_rows(left_out) %>% 
       select(playerid, Name, 'BB%', 'K%', wOBA, 'wRC+', BsR) %>% 
       rename(fg_playerId = playerid)
+
+# complete
+missing_fg <- setdiff(inRedsWandJb$fangraphs_id, fgFranBat$fg_playerId)
 
 
 # Combine Stats
@@ -101,6 +112,9 @@ missing_players4 <- setdiff(advFranBat$name_whole, bbrefFranBat$name_whole)
 table(advFranBat$name_whole)
 advFranBat <- advFranBat[-c(54, 55),]
 
+# complete
+missing_adv <- setdiff(inRedsWandJb$playerId, advFranBat$bbref_playerId)
+
 write_rds(advFranBat, "data/09 - franchiseAdvBatting.rds")
 
 
@@ -114,6 +128,7 @@ tradFranBat <- bbrefFranBat %>%
       slice(-c(54,55)) %>% 
       select(bbref_playerId, fg_playerId, everything())
 
+missing_trad <- setdiff(inRedsWandJb$playerId, tradFranBat$bbref_playerId)
 
 write_rds(tradFranBat, "data/09 - franchiseTradBatting.rds")
 
