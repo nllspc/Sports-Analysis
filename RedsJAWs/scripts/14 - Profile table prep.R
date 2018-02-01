@@ -74,79 +74,66 @@ posn_hof_bat <- mad_median_FUN(hof_bat_num)
 posn_hof_pit <- mad_median_FUN(hof_pit_num)
 
 
+# add Id and Name columns back
+fin_rstd_fr_bat <- rstd_fr_bat %>%
+      bind_cols(franchise_batting[1:2]) %>% 
+      select(bbref_playerId, Name, everything()) %>% 
+      rename(bbref_id = bbref_playerId)
+fin_posn_fr_bat <- posn_fr_bat %>%
+      bind_cols(franchise_batting[1:2]) %>% 
+      select(bbref_playerId, Name, everything()) %>% 
+      rename(bbref_id = bbref_playerId)
+fin_rstd_hof_bat <- rstd_hof_bat %>%
+      bind_cols(hof_batting[1:2]) %>% 
+      select(bbref_playerId, Name, everything()) %>% 
+      rename(bbref_id = bbref_playerId)
+fin_posn_hof_bat <- posn_hof_bat %>%
+      bind_cols(hof_batting[1:2]) %>% 
+      select(bbref_playerId, Name, everything()) %>% 
+      rename(bbref_id = bbref_playerId)
 
-factor_FUN <- function(df) {
-      
-      col_list <- names(df)
-      
-      create_col_FUN <- function(x) {
-            factor_var <- paste0("factor_", x)
-            
-            df %>% 
-                  mutate(!!factor_var := factor(if_else((!! rlang::sym(x)) < 0, "negative", "positive"), levels = c("negative", "positive"))) %>% 
-                  select(factor_var)
-      }
-      
-      factor_df <- map_dfc(col_list, create_col_FUN) %>% 
-            bind_cols(df)
-      
+fin_rstd_fr_pit <-  rstd_fr_pit %>%
+      bind_cols(franchise_pitching[c(1,3)]) %>% 
+      select(bbref_id, Name, everything()) 
+fin_posn_fr_pit <-  posn_fr_pit %>%
+      bind_cols(franchise_pitching[c(1,3)]) %>% 
+      select(bbref_id, Name, everything()) 
+fin_rstd_hof_pit <- rstd_hof_pit %>%
+      bind_cols(hof_pitching[c(1,3)]) %>% 
+      select(bbref_id, Name, everything()) 
+fin_posn_hof_pit <- posn_hof_pit %>%
+      bind_cols(hof_pitching[c(1,3)]) %>% 
+      select(bbref_id, Name, everything()) 
+
+
+sign_FUN <- function(df) {
+      col_df <- as.character(names(df[-c(1,2)]))
+      df_g <- df %>% 
+            gather(col_df, key = "stat", value = "score")
+      df_g$sign <- factor(ifelse(df_g$score < 0, "negative", "positive"), levels = c("negative", "positive"))
+      return(df_g)
 }
 
-fact_rstd_fr_bat <- factor_FUN(rstd_fr_bat)
-fact_rstd_fr_pit <- factor_FUN(rstd_fr_pit)
-fact_rstd_hof_bat <- factor_FUN(rstd_hof_bat)
-fact_rstd_hof_pit <- factor_FUN(rstd_hof_pit)
+final_rfb <- sign_FUN(fin_rstd_fr_bat)
+final_rfp <- sign_FUN(fin_rstd_fr_pit)
+final_rhb <- sign_FUN(fin_rstd_hof_bat)
+final_rhp <- sign_FUN(fin_rstd_hof_pit)
 
-fact_posn_fr_bat <- factor_FUN(posn_fr_bat)
-fact_posn_fr_pit <- factor_FUN(posn_fr_pit)
-fact_posn_hof_bat <- factor_FUN(posn_hof_bat)
-fact_posn_hof_pit <- factor_FUN(posn_hof_pit)
-
-
-
-# add Id and Name columns back
-fin_rstd_fr_bat <-  fact_rstd_fr_bat %>%
-      bind_cols(franchise_batting[1:2]) %>% 
-      select(bbref_playerId, Name, everything()) %>% 
-      rename(bbref_id = bbref_playerId)
-fin_posn_fr_bat <-  fact_posn_fr_bat %>%
-      bind_cols(franchise_batting[1:2]) %>% 
-      select(bbref_playerId, Name, everything()) %>% 
-      rename(bbref_id = bbref_playerId)
-fin_rstd_hof_bat <-  fact_rstd_hof_bat %>%
-      bind_cols(hof_batting[1:2]) %>% 
-      select(bbref_playerId, Name, everything()) %>% 
-      rename(bbref_id = bbref_playerId)
-fin_posn_hof_bat <-  fact_posn_hof_bat %>%
-      bind_cols(hof_batting[1:2]) %>% 
-      select(bbref_playerId, Name, everything()) %>% 
-      rename(bbref_id = bbref_playerId)
-
-
-fin_rstd_fr_pit <-  fact_rstd_fr_pit %>%
-      bind_cols(franchise_pitching[c(1,3)]) %>% 
-      select(bbref_id, Name, everything()) 
-fin_posn_fr_pit <-  fact_posn_fr_pit %>%
-      bind_cols(franchise_pitching[c(1,3)]) %>% 
-      select(bbref_id, Name, everything()) 
-fin_rstd_hof_pit <- fact_rstd_hof_pit %>%
-      bind_cols(hof_pitching[c(1,3)]) %>% 
-      select(bbref_id, Name, everything()) 
-fin_posn_hof_pit <- fact_posn_hof_pit %>%
-      bind_cols(hof_pitching[c(1,3)]) %>% 
-      select(bbref_id, Name, everything()) 
+final_pfb <- sign_FUN(fin_posn_fr_bat)
+final_pfp <- sign_FUN(fin_posn_fr_pit)
+final_phb <- sign_FUN(fin_posn_hof_bat)
+final_php <- sign_FUN(fin_posn_hof_pit)
 
 
 
+write_rds(final_rfb, "data/14 - reg standardization fran batting.rds")
+write_rds(final_rfp, "data/14 - reg standardization fran pitching.rds")
+write_rds(final_rhb, "data/14 - reg standardization hof batting.rds")
+write_rds(final_rhp, "data/14 - reg standardization hof pitching.rds")
 
-write_rds(fin_rstd_fr_bat, "data/14 - reg standardization fran batting.rds")
-write_rds(fin_rstd_fr_pit, "data/14 - reg standardization fran pitching.rds")
-write_rds(fin_rstd_hof_bat, "data/14 - reg standardization hof batting.rds")
-write_rds(fin_rstd_hof_pit, "data/14 - reg standardization hof pitching.rds")
-
-write_rds(fin_posn_fr_bat, "data/14 - pos normalization fran batting.rds")
-write_rds(fin_posn_fr_pit, "data/14 - pos normalization fran pitching.rds")
-write_rds(fin_posn_hof_bat, "data/14 - pos normalization hof batting.rds")
-write_rds(fin_posn_hof_pit, "data/14 - pos normalization hof pitching.rds")
+write_rds(final_pfb, "data/14 - pos normalization fran batting.rds")
+write_rds(final_pfp, "data/14 - pos normalization fran pitching.rds")
+write_rds(final_phb, "data/14 - pos normalization hof batting.rds")
+write_rds(final_php, "data/14 - pos normalization hof pitching.rds")
 
 

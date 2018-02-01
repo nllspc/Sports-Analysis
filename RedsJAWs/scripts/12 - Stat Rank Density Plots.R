@@ -5,7 +5,32 @@
 library(tidyverse)
 library(broom)
 
-inBatStats <- read_rds("./Projects/Sports-Analysis/RedsJAWS/data/10 - inRedsBatStats.rds")
+ggplot2::theme_set(
+      theme_bw(base_family = 'TT Arial', base_size = 12) +
+            theme(
+                  plot.title = element_text(face = 'bold', hjust = 0),
+                  text = element_text(colour = '#4e5c65'),
+                  panel.background = element_rect('#ffffff'),
+                  strip.background = element_rect('#ffffff', colour = 'white'),
+                  plot.background = element_rect('#ffffff'),
+                  panel.border = element_rect(colour = '#ffffff'),
+                  panel.grid.major.x = element_blank(),
+                  panel.grid.major.y = element_blank(),
+                  panel.grid.minor.y = element_blank(),
+                  legend.background = element_rect('#ffffff'),
+                  legend.title = element_blank(),
+                  legend.position = 'right',
+                  legend.direction = 'vertical',
+                  legend.key = element_blank(),
+                  strip.text = element_text(face = 'bold', size = 10),
+                  axis.text = element_text(face = 'bold', size = 9),
+                  axis.title = element_blank(),
+                  axis.ticks = element_blank()
+            )
+)
+
+hof_batting <- read_rds("data/13 - HOF Batting.rds")
+inBatStats <- read_rds("data/10 - inRedsBatStats.rds")
 tradFranBat <- read_rds("./Projects/Sports-Analysis/RedsJAWS/data/09 - tradFranchiseBatting.rds")
 tradFranPit <- read_rds("./Projects/Sports-Analysis/RedsJAWS/data/09 - tradFranchisePitching.rds")
 pitWandJ <- read_rds("./Projects/Sports-Analysis/RedsJAWS/data/07a - pitcherPositionDistribution.rds")
@@ -67,14 +92,14 @@ p
 
 
 
-
+# density() not working with wRC+ right now
 
 # The experimental
 
-df2 <- lfWandJ %>%
-      select(name_whole, redsJAWS) %>% 
-      group_by(name_whole) %>%
-      do(tidy(density(pitWandJ$redsJAWS, bw = "nrd0"))) %>% 
+df2 <-  hof_batting %>%
+      select(Name, `wRC+`) %>% 
+      group_by(Name) %>%
+      do(tidy(density(hof_batting$`wRC+`, bw = "nrd0"))) %>% 
       group_by() %>% 
       mutate(ymin = max(y) / 1.5, 
              ymax = y + ymin,
