@@ -6,7 +6,7 @@ library(tidyverse)
 library(broom)
 
 ggplot2::theme_set(
-      theme_bw(base_family = 'TT Arial', base_size = 12) +
+      theme_bw(base_size = 12) +
             theme(
                   plot.title = element_text(face = 'bold', hjust = 0),
                   text = element_text(colour = '#4e5c65'),
@@ -51,7 +51,9 @@ p1 <- a1 + geom_area(data = subset(d1, x < 3.5), aes(x = x, y = y), fill = "#C60
 p1
 
 
-# The control
+# The control =============================================
+
+
 df <- tradFranBat %>%
       select(bbref_playerId, OBP) %>% 
       group_by(bbref_playerId) %>%
@@ -92,39 +94,39 @@ p
 
 
 
-# density() not working with wRC+ right now
+# The experimental ==============================================
 
-# The experimental
+# Median blocked out in some densities. Maybe increase y axis limits?
 
 df2 <-  hof_batting %>%
       select(Name, `wRC+`) %>% 
       group_by(Name) %>%
-      do(tidy(density(hof_batting$`wRC+`, bw = "nrd0"))) %>% 
+      do(tidy(density(hof_batting$`wRC+`, bw = "nrd0", na.rm = TRUE))) %>% 
       group_by() %>% 
       mutate(ymin = max(y) / 1.5, 
              ymax = y + ymin,
              ylabel = ymin + min(ymin)/2,
              xlabel = min(x) - mean(range(x))/2)
 
-labels2 <- lfWandJ %>% 
-      select(name_whole, redsJAWS) %>% 
-      mutate(median = quantile(redsJAWS)[3]) %>%
+labels2 <- hof_batting %>% 
+      select(Name, `wRC+`) %>% 
+      mutate(median = quantile(`wRC+`, na.rm = TRUE)[3]) %>%
       filter(row_number() == 1) %>% 
-      select(-redsJAWS) %>% 
+      select(-`wRC+`) %>% 
       left_join(df2) %>% 
       mutate(xmed = x[which.min(abs(x - median))],
              yminmed = ymin[which.min(abs(x - median))],
              ymaxmed = ymax[which.min(abs(x - median))]) %>% 
       filter(row_number() == 1)     
 
-shade_bdy <- lfWandJ %>% 
-      filter(name_whole == "Frank Robinson")
-shade_bdy <- shade_bdy$redsJAWS[1]
+shade_bdy <- hof_batting %>% 
+      filter(Name == "Adam Dunn")
+shade_bdy <- shade_bdy$`wRC+`[1]
 
 # 3 decimal places needed for stats like OBP
 scaleFUN <- function(x) {sprintf("%.3f", x)}
 
-a <- ggplot(data = lfWandJ, aes(x = redsJAWS)) +
+a <- ggplot(data = hof_batting, aes(x = `wRC+`)) +
       geom_density(fill = "#000000", alpha = 0.7) +
       # scale_x_continuous(labels = scaleFUN) +
       scale_x_continuous() +

@@ -20,13 +20,6 @@ inWandJ <- read_rds("data/05 06 07b - indRedsWARandJAWS.rds") %>%
       bind_rows(nWandJ) %>% 
       select(playerId, name_whole, POS)
 
-#  Positional Average WAR values
-pAvgWar <- read_rds("data/16 - Average HOF WAR and JAWS.rds") %>% filter(POS == "P") %>% 
-      rename(wtWAR_avg = WAR_avg, wtWAR4_avg = WAR4_avg, wtJAWS_avg = JAWS_avg)
-
-wtAvgWar <- read_rds("data/16 - Weighted Average HOF WAR and JAWS.rds") %>% 
-      bind_rows(pAvgWar)
-
 
 # Minor manipulation
 
@@ -74,8 +67,19 @@ war_combined <- notWar4_pos %>%
 
 # Map weighted averages
 
+#  Positional Average seasonal WAR values
+
+pitMedWar <- war_combined %>% 
+      filter(POS == "P") %>% 
+      summarize(`Median Pitcher WAR` = median(rWAR))
+
+posMedWAR <- war_combined %>% 
+      filter(POS != "P") %>% 
+      summarize(`Median Position WAR` = median(rWAR))
+
+
 war_combo_avg <- war_combined %>% 
-      mutate(wt_avg = plyr::mapvalues(POS, from = wtAvgWar$POS, to = wtAvgWar$wtWAR_avg)) %>% 
+      mutate(`Median WAR` = if_else(POS == "P", pitMedWar$`Median Pitcher WAR`[[1]], posMedWAR$`Median Position WAR`[[1]])) %>% 
       rename(bbref_id = playerId, WAR = rWAR) %>% 
       select(bbref_id, Name, everything()) %>% 
       mutate(Name = if_else(bbref_id == "griffke02", "Ken Griffey Jr", Name))
@@ -100,12 +104,11 @@ group_pos_sum <- wtJAWS_avg %>%
 
 # Player JAWS data
 
-# Need jaws column to be "Player" for the legend label in the dot plot.
 nWandJ <- read_rds("data/05 06 07b - nomRedsWARandJAWS.rds")
 playaWandJ <- read_rds("data/05 06 07b - indRedsWARandJAWS.rds") %>% 
       bind_rows(nWandJ) %>% 
       select(playerId, name_whole, redsJAWS, POS) %>% 
-      rename(bbref_id = playerId, Name = name_whole, Player = redsJAWS, Group = POS) %>% 
+      rename(bbref_id = playerId, Name = name_whole, JAWS = redsJAWS, Group = POS) %>% 
       mutate(Name = if_else(bbref_id == "griffke02", "Ken Griffey Jr", Name))
 
 
