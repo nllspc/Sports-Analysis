@@ -173,6 +173,7 @@ write_rds(pitching_constants, "data/10 - PitchingConstants.rds")
 
 # Gathering needed stats ========================
 
+# Inductees
 iRedsWandJ <- read_rds("data/05 06 07b - indRedsWARandJAWS.rds") %>% 
       filter(POS == "P")
 redsYrsPit <- map_dfr(iRedsWandJ$playerId, function(x) {
@@ -182,20 +183,21 @@ redsYrsPit <- map_dfr(iRedsWandJ$playerId, function(x) {
 redsPitStats <- map2_dfr(redsYrsPit$playerId, redsYrsPit$yearId, function(x, y) {
       filter(Pitching, playerID == x & yearID == y) %>% 
             mutate(IP = IPouts/3) %>% 
-            select(playerID, teamID, yearID, H, HR, BB, HBP, SO, IP)
+            select(playerID, teamID, yearID, W, L, G, GS, CG, SV, IP, H, ER, HR, BB, HBP, SHO, SO, BAOpp)
 })
 
-# Something is up with Jim O'Toole's ID. Pitching db in Lahman has otoolji01 while openWARdat doesn't have the "l" but has "'". openWARdat has the correct id for the bbref site. So that's need changed at my earliest convenience.
+# Something is up with Jim O'Toole's ID. Pitching db in Lahman has otoolji01 while openWARdat doesn't have the "l" but has "'". openWARdat has the correct id for the bbref site. So that needs changed at my earliest convenience.
 otoole <- Pitching %>%
       filter(playerID == "otoolji01" & teamID == "CIN") %>%
       mutate(IP = IPouts/3) %>%
       select(-playerID) %>% 
       add_column(playerID = rep("o'tooji01", 9)) %>% 
-      select(playerID, yearID, H, HR, BB, HBP, SO, IP)
+      select(playerID, teamID, yearID, W, L, G, GS, CG, SV, IP, H, ER, HR, BB, HBP, SHO, SO, BAOpp)
 redsPitStats <- redsPitStats %>%
       bind_rows(otoole)
 
 
+# Nominees
 nRedsWandJ <- read_rds("data/05 06 07b - nomRedsWARandJAWS.rds") %>% 
       filter(POS == "P")
 nRedsYrsPit <- map_dfr(nRedsWandJ$playerId, function(x) {
@@ -205,15 +207,26 @@ nRedsYrsPit <- map_dfr(nRedsWandJ$playerId, function(x) {
 nRedsPitStats <- map2_dfr(nRedsYrsPit$playerId, nRedsYrsPit$yearId, function(x, y) {
       filter(Pitching, playerID == x & yearID == y) %>% 
             mutate(IP = IPouts/3) %>% 
-            select(playerID, teamID, yearID, H, HR, BB, HBP, SO, IP)
+            select(playerID, teamID, yearID, W, L, G, GS, CG, SV, IP, H, ER, HR, BB, HBP, SHO, SO, BAOpp)
 })
 
+# Need this for Numbers Pg
+inTradPitStats <- redsPitStats %>% 
+      bind_rows(nRedsPitStats) %>% 
+      filter(teamID == "CIN" | teamID == "CN1" | teamID == "CN2" | teamID == "CN3") %>% 
+      rename(bbref_id = playerID, Year = yearID) %>% 
+      select(-teamID, -HR, -HBP)
+n_distinct(inTradPitStats$bbref_id)
+setdiff(redsPitStats$playerID, inTradPitStats$bbref_id)
+write_rds(inTradPitStats, "data/10 - seasTraditionalPitStats.rds")
+
+# Stats for adv stats calc
 inRedsPitStats <- redsPitStats %>% 
       bind_rows(nRedsPitStats) %>% 
-      filter(teamID == "CIN") %>% 
+      filter(teamID == "CIN" | teamID == "CN1" | teamID == "CN2") %>% 
       rename(playerId = playerID, yearId = yearID) %>% 
-      select(-teamID)
-
+      select(playerId, yearId, H, ER, HR, BB, HBP, SO, IP)
+n_distinct(inRedsPitStats$playerId)
 write_rds(inRedsPitStats, "data/10 - inRedsPitStats.rds")
 
 
@@ -264,7 +277,8 @@ tempTibPit <- tibble(
       K_per_BB = numeric(),
       K_per_nine = numeric(),
       WHIP = numeric(),
-      FIP_minus = numeric()
+      FIP_minus = numeric(),
+      ERA = numeric()
 )
 
 # input: playerId and yearId; function calcs adv stats for each player
@@ -279,6 +293,7 @@ fillAdv <- function(player, year) {
       fill_SO <- fill_stat$SO[1]
       fill_IP <- fill_stat$IP[1]
       fill_H <- fill_stat$H[1]
+      fill_ER <- fill_stat$ER[1]
       
       tempTibPit <- tempTibPit %>%
             add_row(
@@ -287,7 +302,8 @@ fillAdv <- function(player, year) {
                   K_per_BB = round(fill_SO/fill_BB, 2),
                   K_per_nine = round(fill_SO/(fill_IP/9), 2),
                   WHIP = round((fill_H + fill_BB)/fill_BB, 2),
-                  FIP_minus = round(fip_minus(FIP, quo(player), quo(year)), 0)
+                  FIP_minus = round(fip_minus(FIP, quo(player), quo(year)), 0),
+                  ERA = round((9*fill_ER)/fill_IP, 2)
             )
 }
 
@@ -304,7 +320,7 @@ missPitAdv <- naniar::miss_var_summary(seasRedsPitAdv)
 seasRedsPitAdv <- seasRedsPitAdv %>% 
       rename(`K/BB` = K_per_BB, `K/9` = K_per_nine, `FIP-` = FIP_minus)
 
-write_rds(seasRedsPitAdv, "data/seasAdvancedPitStats.rds")
+write_rds(seasRedsPitAdv, "data/10 - seasAdvancedPitStats.rds")
 
 
 
@@ -337,13 +353,27 @@ augBatStats <- battingStats()
 inRedsBatStats <- map2_dfr(inRedsYrsBat$playerId, inRedsYrsBat$yearId, function(x, y) {
       filter(augBatStats, playerID == x & yearID == y)
 })
+
+# Seeing if Batting db has same extra Reds teamIds and it does
+table(inRedsBatStats$teamID)
 inRedsBatStats <- inRedsBatStats %>% 
       rename(playerId = playerID, yearId = yearID) %>%
       mutate(one_B = H - (X2B + X3B + HR), uBB = BB - IBB) %>% 
-      filter(teamID == "CIN")
+      filter(teamID == "CIN" | teamID == "CN1" | teamID == "CN2" | teamID == "CN3") %>% 
+      mutate(teamID = as.character(teamID))
+
+# always have to make sure everyone is here
+n_distinct(inRedsBatStats$playerId)
 
 write_rds(inRedsBatStats, "data/10 - inRedsBatStats.rds")
 
+# Need this for Numbers page
+sTradBat <- inRedsBatStats %>% 
+      select(-stint, -teamID, -lgID, -CS, -IBB, -SH, -SF, -GIDP, -TB, -uBB, -HBP) %>% 
+      rename(`1B` = one_B, SLG = SlugPct, bbref_id = playerId, Year = yearId) %>% 
+      select(bbref_id:AB, PA, H, `1B`, everything())
+
+write_rds(sTradBat, "data/10 - seasTraditionalBatStats.rds")
 
 # Calculation ===================================
 
@@ -450,7 +480,7 @@ seasRedsBatAdv <- seasRedsBatAdv %>%
 missBatAdv <- naniar::miss_var_summary(seasRedsBatAdv)
 
 
-write_rds(seasRedsBatAdv, "data/seasAdvancedBatStats.rds")
+write_rds(seasRedsBatAdv, "data/10 - seasAdvancedBatStats.rds")
 
 
 

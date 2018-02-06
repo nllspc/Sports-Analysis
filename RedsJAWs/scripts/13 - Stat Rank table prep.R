@@ -37,12 +37,12 @@ tradFranPit <- read_rds("data/09 - tradFranchisePitching.rds")
 
 # Create Franchise Table =========================
 
-fgFranBat <- read_csv("data/09 - FanGraphs Franchise Batting.csv")
-rolen <- read_csv("data/09 - FanGraphs Rolen.csv") %>% 
+fgFranBat <- read_csv("data/csv/09 - FanGraphs Franchise Batting.csv")
+rolen <- read_csv("data/csv/09 - FanGraphs Rolen.csv") %>% 
       filter(Name == "Scott Rolen")
-mcc <- read_csv("data/09 - FanGraphs McCormick.csv") %>% 
+mcc <- read_csv("data/csv/09 - FanGraphs McCormick.csv") %>% 
       filter(Name == "Mike McCormick")
-smk <- read.csv("data/09 - FanGraphs Burgess.csv") %>% 
+smk <- read.csv("data/csv/09 - FanGraphs Burgess.csv") %>% 
       rename(Name = ï..Name) %>% 
       mutate(Name = as.character(Name)) %>% 
       filter(Name == "Smoky Burgess")
@@ -75,22 +75,30 @@ jr <- franchise_batting %>%
       filter(fg_playerId == "327") %>% 
       mutate(name_whole = if_else(name_whole == "Ken Griffey", "Ken Griffey Jr", name_whole))
 
+
 franchise_batting <- franchise_batting[-54,] %>% 
       bind_rows(jr) %>%
       rename(Name = name_whole, fWAR = WAR) %>% 
       arrange(bbref_playerId) %>% 
       select(-fg_playerId, -Yrs, -From, -To, -CS)
 
+
 # K%, BB% are char vars with % in the values
 K_perc <- strsplit(franchise_batting$`K%`, " ", fixed = TRUE)
 BB_perc <- strsplit(franchise_batting$`BB%`, " ", fixed = TRUE)
+
 franchise_batting <- franchise_batting[-c(19,20)]
+
 firstElt <- function(x) {x[1]}
 franchise_batting$K_perc <- sapply(K_perc, firstElt)
 franchise_batting$BB_perc <- sapply(BB_perc, firstElt)
+
 franchise_batting <- franchise_batting %>% 
       mutate('K%' = as.numeric(K_perc), 'BB%' = as.numeric(BB_perc)) %>% 
       select(-K_perc, -BB_perc)
+
+
+
 franchise_batting <- franchise_batting %>% 
       select(bbref_playerId:BB, `BB%`, SO, `K%`, everything())
 
