@@ -88,13 +88,17 @@ fran_num <- fran_num %>%
 fran_num <- fran_num %>% 
       select(bbref_playerId:BB, `BB%`, SO, `K%`, everything())
 
-hof_num <- map_dfr(inWandJb$playerId, function(x) {filter(fran_num, bbref_playerId == x)})
+hof_num <- map_dfr(inWandJb$playerId, function(x) {filter(fran_num, bbref_playerId == x)}) %>% 
+      rename(`BBRef Id` = bbref_playerId, `FG Id` = fg_playerId) %>% 
+      arrange(`BBRef Id`)
 
 
 write_rds(hof_num, "data/20 - Numbers pg HOF Batting.rds")
 
-# Pitching table looks good as is I think.
-num_hof_pitching <- read_rds("data/13 - HOF Pitching.rds")
+# Pitching ====
+num_hof_pitching <- read_rds("data/13 - HOF Pitching.rds") %>% 
+      rename(`BBRef Id` = bbref_id, `FG Id` = fg_id)
+write_rds(num_hof_pitching, "data/20 - Numbers pg HOF Pitching.rds")
 
 
 
@@ -111,8 +115,8 @@ sTradPit <- read_rds("data/10 - seasTraditionalPitStats.rds") %>%
 
 # Advanced
 sAdvBat <- read_rds("data/10 - seasAdvancedBatStats.rds") %>% 
-      rename(`BBRef Id` = playerId) %>% 
-      select(-yearId)
+      rename(`BBRef Id` = playerId, Year = yearId) %>% 
+      select(-wRAA)
 sAdvPit <- read_rds("data/10 - seasAdvancedPitStats.rds") %>% 
       rename(`BBRef Id` = playerId, Year = yearId)
 
@@ -124,10 +128,138 @@ sAdvPit %>% summarize(n = n_distinct(`BBRef Id`))
 
 # Get Names and FG Ids
 num_hof_batting <- read_rds("data/20 - Numbers pg HOF Batting.rds") 
-num_hof_pitching <- read_rds("data/13 - HOF Pitching.rds")
+num_hof_pitching <- read_rds("data/20 - Numbers pg HOF Pitching.rds")
 
 seasBat <- sTradBat %>%
-      mutate(`FG Id` = plyr::mapvalues(`BBRef Id`, from = num_hof_batting$bbref_playerId, to = num_hof_batting$fg_playerId), Name = plyr::mapvalues(`BBRef Id`, from = num_hof_batting$bbref_playerId, to = num_hof_batting$Name)) %>% 
+      mutate(`FG Id` = plyr::mapvalues(`BBRef Id`, from = num_hof_batting$`BBRef Id`, to = num_hof_batting$`FG Id`), Name = plyr::mapvalues(`BBRef Id`, from = num_hof_batting$`BBRef Id`, to = num_hof_batting$Name)) %>% 
       select(`BBRef Id`, `FG Id`, Name, everything()) %>% 
-      inner_join(sAdvBat, by = "BBRef Id")
+      inner_join(sAdvBat, by = c("BBRef Id", "Year"))
 
+seasPit <- sTradPit %>%
+      mutate(`FG Id` = plyr::mapvalues(`BBRef Id`, from = num_hof_pitching$`BBRef Id`, to = num_hof_pitching$`FG Id`), Name = plyr::mapvalues(`BBRef Id`, from = num_hof_pitching$`BBRef Id`, to = num_hof_pitching$Name)) %>% 
+      select(`BBRef Id`, `FG Id`, Name, everything()) %>% 
+      inner_join(sAdvPit, by = c("BBRef Id", "Year"))
+
+
+write_rds(seasBat, "data/20 - Numbers pg HOF seas Batting.rds")
+write_rds(seasPit, "data/20 - Numbers pg HOF seas Pitching.rds")
+
+
+# Fielding, tenure =======================================
+
+# Need bbref ids and I'll move innings further to the front
+field_tenure <- read_rds("data/10 - careerAdvancedFieldingStats.rds")
+n_distinct(field_tenure$playerid)
+
+# Griff jr not included in fielding stats; and Peter Rose Jr is included
+setdiff(num_hof_batting$`FG Id`, field_tenure$playerid)
+setdiff(field_tenure$playerid, num_hof_batting$`FG Id`)
+
+# slice can kiss my ass. Not working for me
+rose_jr <- field_tenure %>% 
+      filter(playerid == "1011218")
+field_tenure <- field_tenure %>% 
+      anti_join(rose_jr, by = c("playerid", "Pos"))
+
+adv_field <- read_csv("data/csv/10 - FanGraphs DRS, TZL, UZR, DEF.csv")
+tz_field <- read_csv("data/csv/10 - FanGraphs TZ.csv")
+
+griff_adv <- adv_field %>% 
+      filter(playerid == "327") %>% 
+      select(playerid, Pos, DRS, TZL, UZR, Def)
+
+griff <- tz_field %>%
+      filter(playerid == "327") %>% 
+      select(playerid, Name, Pos, G, GS, Inn, TZ) %>% 
+      inner_join(griff_adv, by = c("playerid", "Pos")) %>% 
+      mutate(Name = if_else(Name == "Ken Griffey Jr.", "Ken Griffey Jr", Name))
+
+field_tenure <- field_tenure %>% 
+      bind_rows(griff)
+
+field_tenure <- field_tenure %>% 
+      mutate(`BBRef Id` = plyr::mapvalues(playerid, from = num_hof_batting$`FG Id`, to = num_hof_batting$`BBRef Id`)) %>% 
+      rename(`FG Id` = playerid) %>% 
+      select(`BBRef Id`, `FG Id`, Pos:GS, Inn, everything())
+
+# We good.
+setdiff(num_hof_batting$`FG Id`, field_tenure$`FG Id`)
+setdiff(field_tenure$`FG Id`, num_hof_batting$`FG Id`)
+n_distinct(field_tenure$`FG Id`)
+
+write_rds(field_tenure, "data/20 - Numbers pg HOF Fielding.rds")
+
+
+
+# Postseason, tenure ===========================================
+
+hof_bat <- read_rds("data/20 - Numbers pg HOF Batting.rds")
+hof_Pit <- read_rds("data/20 - Numbers pg HOF Pitching.rds")
+
+# Some pruning; Rename Slugging; add FG Id, Name
+ps_bat <- read_rds("data/11 - careerRedsPostseasonBat.rds") %>% 
+      select(-CS, -IBB, -HBP, -SH, -SF, -GIDP, -PA.1, -TB.1) %>% 
+      rename(SLG = SlugPct) %>%
+      mutate(`FG Id` = plyr::mapvalues(playerId, from = hof_bat$`BBRef Id`, to = hof_bat$`FG Id`), Name = plyr::mapvalues(playerId, from = hof_bat$`BBRef Id`, to = hof_bat$Name)) %>% 
+      rename(`BBRef Id` = playerId, `2B` = X2B, `3B` = X3B) %>% 
+      select(`BBRef Id`, `FG Id`, Name, everything())
+      
+      
+ps_pit <- read_rds("data/11 - careerRedsPostseasonPit.rds") %>% 
+      select(-HR, -IBB, -WP, -HBP, -BK, -BFP, -GF, -SH, -SF, -GIDP, -IPouts) %>% 
+      mutate(`FG Id` = plyr::mapvalues(playerId, from = hof_Pit$`BBRef Id`, to = hof_Pit$`FG Id`), Name = plyr::mapvalues(playerId, from = hof_Pit$`BBRef Id`, to = hof_Pit$Name)) %>% 
+      rename(`BBRef Id` = playerId) %>% 
+      select(`BBRef Id`, `FG Id`, Name, W:CG, IP, SHO:H, R, everything())
+
+
+write_csv(ps_bat, "data/20 - Numbers pg HOF Postseason Batting.rds")
+write_csv(ps_pit, "data/20 - Numbers pg HOF Postseason Pitching.rds")
+
+
+
+# Awards ===========================================
+
+hof_bat <- read_rds("data/20 - Numbers pg HOF Batting.rds")
+hof_Pit <- read_rds("data/20 - Numbers pg HOF Pitching.rds")
+
+awards_bat <- read_rds("data/11 - summaryBattingAwards.rds") %>%
+      ungroup() %>% 
+      mutate(`FG Id` = plyr::mapvalues(playerID, from = hof_bat$`BBRef Id`, to = hof_bat$`FG Id`), Name = plyr::mapvalues(playerID, from = hof_bat$`BBRef Id`, to = hof_bat$Name)) %>%
+      rename(`BBRef Id` = playerID, Award = awardID) %>% 
+      select(`BBRef Id`,`FG Id`, Name, everything())
+      
+awards_pit <- read_rds("data/11 - summaryPitchingAWards.rds") %>% 
+      ungroup() %>% 
+      mutate(`FG Id` = plyr::mapvalues(playerID, from = hof_Pit$`BBRef Id`, to = hof_Pit$`FG Id`), Name = plyr::mapvalues(playerID, from = hof_Pit$`BBRef Id`, to = hof_Pit$Name)) %>% 
+      rename(`BBRef Id` = playerID, Award = awardID) %>% 
+      select(`BBRef Id`, `FG Id`, Name, everything())
+
+awards <- awards_bat %>% 
+      bind_rows(awards_pit)
+
+write_rds(awards, "data/20 - Numbers pg HOF Awards.rds")
+
+
+
+# Award Shares ============================================
+hof_bat <- read_rds("data/20 - Numbers pg HOF Batting.rds")
+hof_Pit <- read_rds("data/20 - Numbers pg HOF Pitching.rds")
+
+shares_bat <- read_rds("data/11 - battingAwardsVoteShares.rds") %>% 
+      select(-lgID) %>% 
+      mutate(`FG Id` = plyr::mapvalues(playerID, from = hof_bat$`BBRef Id`, to = hof_bat$`FG Id`), Name = plyr::mapvalues(playerID, from = hof_bat$`BBRef Id`, to = hof_bat$Name)) %>%
+      rename(`BBRef Id` = playerID, Award = awardID, Year = yearID, `Vote %` = vote_percentage) %>% 
+      select(`BBRef Id`,`FG Id`, Name, Year, Award, everything())
+
+
+shares_pit <- read_rds("data/11 - pitchingAwardsVoteShares.rds") %>% 
+      select(-lgID) %>%
+      mutate(`FG Id` = plyr::mapvalues(playerID, from = hof_Pit$`BBRef Id`, to = hof_Pit$`FG Id`), Name = plyr::mapvalues(playerID, from = hof_Pit$`BBRef Id`, to = hof_Pit$Name)) %>%
+      rename(`BBRef Id` = playerID, Award = awardID, Year = yearID, `Vote %` = vote_percentage) %>% 
+      select(`BBRef Id`,`FG Id`, Name, Year, Award, everything())
+
+shares <- shares_bat %>% 
+      bind_rows(shares_pit)
+
+write_rds(shares, "data/20 - Numbers pg HOF Award Shares.rds")
+      
