@@ -1,12 +1,13 @@
 # Profile deviation graphs
 
-
+# Going with HOF dataset and Positional Normalization
 
 
 
 
 library(tidyverse)
 library(ggpubr)
+
 
 rfb <- read_rds("data/14 - reg standardization fran batting.rds")
 rfp <- read_rds("data/14 - reg standardization fran pitching.rds")
@@ -19,10 +20,10 @@ phb <- read_rds("data/14 - pos normalization hof batting.rds")
 php <- read_rds("data/14 - pos normalization hof pitching.rds")
 
 
-rfb_bench <- rfb %>%
-      filter(Name == "Johnny Bench")
+phb_griff <- phb %>%
+      filter(Name == "Ken Griffey Jr")
 
-rfb_dunn <- phb %>% 
+phb_dunn <- phb %>% 
       filter(Name == "Adam Dunn")
 
 # Color by groups
@@ -37,25 +38,30 @@ rfb_dunn <- phb %>%
 # ggplot2 theme
 # Make it vertical
 
-ggdotchart(rfb_bench, x = "stat", y = "score",
+# Experimental
+p <- ggdotchart(phb_griff, x = "stat", y = "score",
            color = "sign",                                
-           palette = c("#00AFBB", "#E7B800", "#FC4E07"), 
+                 palette = c("#000000", "#C6011F", "#FC4E07"), 
            sorting = "descending",                       
            add = "segments",                             
            add.params = list(color = "lightgray", size = 2), 
            group = "sign",
-           label = round(rfb_bench$score, 1),
-           dot.size = 6,                                 
+           label = round(phb_griff$score, 1),
+           xlab = FALSE,
+           dot.size = 7, 
            font.label = list(color = "white", size = 9, 
                              vjust = 0.5),               
            ggtheme = theme_pubr(),                       
            rotate = TRUE
 )+
-      geom_vline(xintercept = 0, linetype = 2, color = "lightgray")
+      geom_vline(xintercept = 0, linetype = 2, color = "lightgray") + rremove("x.axis") + rremove("legend")
+
+ggpar(p, title = "HOF Score", caption = "Score relates player to typical HOFer", ticks = FALSE)
 
 
 
-ggdotchart(rfb_dunn, x = "stat", y = "score",
+# Control
+ggdotchart(phb_dunn, x = "stat", y = "score",
            title = "Reds HOF",
            color = "sign",                                
            palette = c("#00AFBB", "#E7B800", "#FC4E07"), 
@@ -63,7 +69,7 @@ ggdotchart(rfb_dunn, x = "stat", y = "score",
            add = "segments",                             
            add.params = list(color = "lightgray", size = 2), 
            group = "sign",
-           label = round(rfb_bench$score, 1),
+           label = round(phb_dunn$score, 1),
            dot.size = 6,                                 
            font.label = list(color = "white", size = 9, 
                              vjust = 0.5),               

@@ -37,7 +37,7 @@ write_rds(jaws_ref_table, "data/17 - JAWS Reference Table.rds")
 
 kable_jaws_tbl <- kable(jaws_ref_table, "html") %>% 
       kable_styling() %>% 
-      add_header_above(c(" " = 1, "Unweighted with Avg HOFers" = 4, "Weighted with Avg HOFers" = 3)) %>% 
+      add_header_above(c(" " = 1, "Unweighted with Typical HOFers" = 4, "Weighted with Typical HOFers" = 3)) %>% 
       group_rows("Pos Players", 2, 9, label_row_css = "background-color: #C6011F; color: #fff;") %>% 
       group_rows("Other Groups", 10, 14, label_row_css = "background-color: #C6011F; color: #fff;")
 

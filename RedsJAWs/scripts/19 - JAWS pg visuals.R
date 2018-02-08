@@ -43,7 +43,7 @@ ggplot(bench_jaws, aes(x = Value, y = Group)) +
       geom_text(data = bench_right_label, aes(color = Stat, label = round(Value, 1)), size = 5, hjust = -0.5) +
       geom_text(data = bench_left_label, aes(color = Stat, label = round(Value, 1)), size = 5, hjust = 1.5) +
       scale_x_continuous(limits = c(min(bench_jaws$Value)-10, max(bench_jaws$Value)+10)) + 
-      scale_color_manual(labels = c("Avg HOF", "Player"), values = c("#000000", "#C6011F")) +
+      scale_color_manual(labels = c("Typical HOFer", "Player"), values = c("#000000", "#C6011F")) +
       labs(title = "JAWS-4") +
       theme_minimal() +
       theme(axis.title = element_blank(),
@@ -112,7 +112,7 @@ ggplot(data = bench_war) +
       geom_point(aes(x = yearId, y = WAR, group = type), color = alpha("#000000", 0.5)) +
       geom_point(data = bench_filtered, aes(x = yearId, y = WAR, color = type), size = 2.5, shape = 17) +
       geom_line(aes(x = yearId, y = WAR)) +
-      geom_hline(aes(yintercept = mean(`Median WAR`), linetype = "median HOF"), color = alpha("#C6011F", 0.5), size = 1.25) +
+      geom_hline(aes(yintercept = mean(`Median WAR`), linetype = "Typical HOFer"), color = alpha("#C6011F", 0.5), size = 1.25) +
       scale_linetype_manual(values = 2, guide = guide_legend(override.aes = list(color = "#C6011F"))) +
       scale_y_continuous(limits = c(min(bench_war$WAR)-5, max(bench_war$WAR)+5)) +
       labs(title = "WAR") +
@@ -144,7 +144,7 @@ ggplot(data = sanders_war) +
       geom_point(aes(x = yearId, y = WAR, group = type), color = alpha("#000000", 0.5)) +
       geom_point(data = sanders_filtered, aes(x = yearId, y = WAR, color = type), size = 2.5, shape = 17) +
       geom_line(aes(x = yearId, y = WAR)) +
-      geom_hline(aes(yintercept = mean(`Median WAR`), linetype = "median HOF"), color = alpha("#C6011F", 0.5), size = 1.25) +
+      geom_hline(aes(yintercept = mean(`Median WAR`), linetype = "Typical HOFer"), color = alpha("#C6011F", 0.5), size = 1.25) +
       scale_linetype_manual(values = 2, guide = guide_legend(override.aes = list(color = "#C6011F"))) +
       scale_y_continuous(limits = c(min(sanders_war$WAR)-5, max(sanders_war$WAR)+5)) +
       labs(title = "WAR") +

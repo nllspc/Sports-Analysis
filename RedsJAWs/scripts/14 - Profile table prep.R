@@ -109,7 +109,8 @@ fin_posn_hof_pit <- posn_hof_pit %>%
 sign_FUN <- function(df) {
       col_df <- as.character(names(df[-c(1,2)]))
       df_g <- df %>% 
-            gather(col_df, key = "stat", value = "score")
+            gather(col_df, key = "stat", value = "score") %>% 
+            mutate(score = if_else(stat == "K%", score * -1, score), score = if_else(stat == "SO", score * -1, score)) 
       df_g$sign <- factor(ifelse(df_g$score < 0, "negative", "positive"), levels = c("negative", "positive"))
       return(df_g)
 }
