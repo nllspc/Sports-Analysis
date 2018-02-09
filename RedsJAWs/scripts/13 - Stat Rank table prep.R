@@ -100,7 +100,8 @@ franchise_batting <- franchise_batting %>%
 
 
 franchise_batting <- franchise_batting %>% 
-      select(bbref_playerId:BB, `BB%`, SO, `K%`, everything())
+      select(bbref_playerId:BB, `BB%`, SO, `K%`, everything()) %>% 
+      select(-bbref_playerId)
 
 write_rds(franchise_batting, "data/13 - Franchise Batting.rds")
 
@@ -217,7 +218,7 @@ franchise_pitching$BB_perc <- sapply(BB_perc, firstElt)
 franchise_pitching$K_BB_perc <- sapply(K_BB_perc, firstElt)
 franchise_pitching <- franchise_pitching %>% 
       mutate('K%' = as.numeric(K_perc), 'BB%' = as.numeric(BB_perc), 'K-BB%' = as.numeric(K_BB_perc)) %>% 
-      select(-K_perc, -BB_perc, -K_BB_perc)
+      select(-K_perc, -BB_perc, -K_BB_perc, -bbref_id, -fg_id, -From, -To)
 
 write_rds(franchise_pitching, "data/13 - Franchise Pitching.rds")
 

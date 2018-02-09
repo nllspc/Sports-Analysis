@@ -13,10 +13,10 @@ hof_pitching <- read_rds("data/13 - HOF Pitching.rds")
 
 
 # Get only the numeric vars
-fr_bat_num <- franchise_batting[-c(1,2)]
-fr_pit_num <- franchise_pitching[-c(1,2,3,5,6)]
-hof_bat_num <- hof_batting[-c(1,2)]
-hof_pit_num <- hof_pitching[-c(1,2,3,5,6)]
+fr_bat_num <- franchise_batting[-1]
+fr_pit_num <- franchise_pitching[-1]
+hof_bat_num <- hof_batting[-1]
+hof_pit_num <- hof_pitching[-1]
 
 
 # Reg standardization
@@ -74,39 +74,35 @@ posn_hof_bat <- mad_median_FUN(hof_bat_num)
 posn_hof_pit <- mad_median_FUN(hof_pit_num)
 
 
-# add Id and Name columns back
+# add Name columns back
 fin_rstd_fr_bat <- rstd_fr_bat %>%
-      bind_cols(franchise_batting[1:2]) %>% 
-      select(bbref_playerId, Name, everything()) %>% 
-      rename(bbref_id = bbref_playerId)
+      bind_cols(franchise_batting[1]) %>% 
+      select(Name, everything())
 fin_posn_fr_bat <- posn_fr_bat %>%
-      bind_cols(franchise_batting[1:2]) %>% 
-      select(bbref_playerId, Name, everything()) %>% 
-      rename(bbref_id = bbref_playerId)
+      bind_cols(franchise_batting[1]) %>% 
+      select(Name, everything()) 
 fin_rstd_hof_bat <- rstd_hof_bat %>%
-      bind_cols(hof_batting[1:2]) %>% 
-      select(bbref_playerId, Name, everything()) %>% 
-      rename(bbref_id = bbref_playerId)
+      bind_cols(hof_batting[1]) %>% 
+      select(Name, everything())
 fin_posn_hof_bat <- posn_hof_bat %>%
       bind_cols(hof_batting[1:2]) %>% 
-      select(bbref_playerId, Name, everything()) %>% 
-      rename(bbref_id = bbref_playerId)
+      select(Name, everything())
 
 fin_rstd_fr_pit <-  rstd_fr_pit %>%
-      bind_cols(franchise_pitching[c(1,3)]) %>% 
-      select(bbref_id, Name, everything()) 
+      bind_cols(franchise_pitching[1]) %>% 
+      select(Name, everything()) 
 fin_posn_fr_pit <-  posn_fr_pit %>%
-      bind_cols(franchise_pitching[c(1,3)]) %>% 
-      select(bbref_id, Name, everything()) 
+      bind_cols(franchise_pitching[1]) %>% 
+      select(Name, everything()) 
 fin_rstd_hof_pit <- rstd_hof_pit %>%
-      bind_cols(hof_pitching[c(1,3)]) %>% 
-      select(bbref_id, Name, everything()) 
+      bind_cols(hof_pitching[1]) %>% 
+      select(Name, everything()) 
 fin_posn_hof_pit <- posn_hof_pit %>%
-      bind_cols(hof_pitching[c(1,3)]) %>% 
-      select(bbref_id, Name, everything()) 
+      bind_cols(hof_pitching[1]) %>% 
+      select(Name, everything()) 
 
 
-sign_FUN <- function(df) {
+bat_sign_FUN <- function(df) {
       col_df <- as.character(names(df[-c(1,2)]))
       df_g <- df %>% 
             gather(col_df, key = "stat", value = "score") %>% 
@@ -115,17 +111,25 @@ sign_FUN <- function(df) {
       return(df_g)
 }
 
-final_rfb <- sign_FUN(fin_rstd_fr_bat)
-final_rfp <- sign_FUN(fin_rstd_fr_pit)
-final_rhb <- sign_FUN(fin_rstd_hof_bat)
-final_rhp <- sign_FUN(fin_rstd_hof_pit)
-
-final_pfb <- sign_FUN(fin_posn_fr_bat)
-final_pfp <- sign_FUN(fin_posn_fr_pit)
-final_phb <- sign_FUN(fin_posn_hof_bat)
-final_php <- sign_FUN(fin_posn_hof_pit)
+final_rfb <- bat_sign_FUN(fin_rstd_fr_bat)
+final_rhb <- bat_sign_FUN(fin_rstd_hof_bat)
+final_pfb <- bat_sign_FUN(fin_posn_fr_bat)
+final_phb <- bat_sign_FUN(fin_posn_hof_bat)
 
 
+pit_sign_FUN <- function(df) {
+      col_df <- as.character(names(df[-1]))
+      df_g <- df %>% 
+            gather(col_df, key = "stat", value = "score") %>% 
+            mutate(score = if_else(stat %in% c("L", "ERA", "ERA-", "FIP-", "xFIP-", "SIERA", "WHIP", "BB/9", "HR/9", "AVG", "BB%"), score * -1, score)) 
+      df_g$sign <- factor(ifelse(df_g$score < 0, "negative", "positive"), levels = c("negative", "positive"))
+      return(df_g)
+}
+
+final_rfp <- pit_sign_FUN(fin_rstd_fr_pit)
+final_rhp <- pit_sign_FUN(fin_rstd_hof_pit)
+final_pfp <- pit_sign_FUN(fin_posn_fr_pit)
+final_php <- pit_sign_FUN(fin_posn_hof_pit)
 
 write_rds(final_rfb, "data/14 - reg standardization fran batting.rds")
 write_rds(final_rfp, "data/14 - reg standardization fran pitching.rds")
@@ -136,5 +140,4 @@ write_rds(final_pfb, "data/14 - pos normalization fran batting.rds")
 write_rds(final_pfp, "data/14 - pos normalization fran pitching.rds")
 write_rds(final_phb, "data/14 - pos normalization hof batting.rds")
 write_rds(final_php, "data/14 - pos normalization hof pitching.rds")
-
 

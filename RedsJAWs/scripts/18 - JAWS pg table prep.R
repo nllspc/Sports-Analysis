@@ -94,7 +94,8 @@ write_rds(war_combo_avg, "data/18 - JAWS pg line chart table.rds")
 groupSummary <- read_rds("data/07b - otherGroupSummary.rds") %>% 
       rename(JAWS_avg = redsJAWS) %>% 
       select(Group, JAWS_avg)
-wtJAWS_avg <- wtAvgWar %>% 
+
+wtJAWS_avg <- read_rds("data/16 - Weighted Average HOF WAR and JAWS.rds") %>% 
       select(POS, wtJAWS_avg) %>%
       rename(Group = POS, JAWS_avg = wtJAWS_avg)
       
@@ -140,7 +141,10 @@ pwj_complete <- playaWandJ %>%
 
 # Map JAWS averages
 jaws_group <- pwj_complete %>% 
-      mutate(`Avg HOF` = plyr::mapvalues(Group, from = group_pos_sum$Group, to = group_pos_sum$JAWS_avg))
+      mutate(`Avg HOF` = plyr::mapvalues(Group, from = group_pos_sum$Group, to = group_pos_sum$JAWS_avg)) %>% 
+      gather(key = "Stat", value = "Value", -c(bbref_id, Name, Group)) %>% 
+      mutate(Value = as.numeric(Value)) %>% 
+      select(-bbref_id)
 
 
 write_rds(jaws_group, "data/18 - JAWS pg dot chart table.rds")

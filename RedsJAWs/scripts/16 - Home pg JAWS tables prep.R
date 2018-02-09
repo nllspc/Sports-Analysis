@@ -9,6 +9,7 @@ iWandJ <- read_rds("data/05 06 07b - indRedsWARandJAWS.rds")
 nWandJ <- read_rds("data/05 06 07b - nomRedsWARandJAWS.rds")
 inWandJ <- iWandJ %>% 
       bind_rows(nWandJ)
+
 groupWandJ <- read_rds("data/08 - unweightedandGroupJoyplot.rds")
 wtWandJ <- read_rds("data/08 - weightedPositionJoyPlot.rds")
 groupSummary <- read_rds("data/07b - otherGroupSummary.rds")

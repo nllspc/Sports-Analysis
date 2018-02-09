@@ -94,7 +94,7 @@ p
 
 # The experimental ============================================
 
-# Median blocked out in some densities. Maybe increase y axis limits?
+# Haven't figured out how to make the xaxis display correct precision for every stat yet
 
 # Density calculation
 df2 <-  hof_bat %>%
@@ -182,6 +182,13 @@ hof_density_FUN <- function(play_sel, col_sel) {
             filter(Name == play_sel)
       shade_bdy <- shade_bdy[, col_sel][[1]]
       
+      
+      if(col_sel %in% c("wRC+", "BB%", "K%", "OPS+")) {
+            col_sel <- paste0("`", col_sel, "`")
+      } else {
+            col_sel
+      }
+      
       # frame
       a <- ggplot(data = hof_bat, aes_string(x = quo_name(col_sel))) +
             geom_density(fill = "#000000", alpha = 0.7) +
@@ -202,10 +209,6 @@ hof_density_FUN <- function(play_sel, col_sel) {
       
 }
 
-hof_density_FUN("Reggie Sanders", "BB")
-
-
-
-
+hof_density_FUN("Reggie Sanders", "wRC+")
 
 

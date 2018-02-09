@@ -4,7 +4,7 @@
 
 
 library(tidyverse)
-
+library(ggiraph)
 
 
 
@@ -14,14 +14,10 @@ library(tidyverse)
 jaws_group <- read_rds("data/18 - JAWS pg dot chart table.rds")
 
 bench_jaws <- jaws_group %>% 
-      filter(Name == "Johnny Bench") %>% 
-      gather(key = "Stat", value = "Value", -c(bbref_id, Name, Group)) %>% 
-      mutate(Value = as.numeric(Value))
+      filter(Name == "Johnny Bench")
 
 boone_jaws <- jaws_group %>% 
-      filter(Name == "Aaron Boone") %>% 
-      gather(key = "Stat", value = "Value", -c(bbref_id, Name, Group)) %>% 
-      mutate(Value = as.numeric(Value))
+      filter(Name == "Aaron Boone")
 
 
 # Bench
@@ -37,7 +33,7 @@ bench_left_label <- bench_jaws %>%
       arrange(desc(Value)) %>% 
       slice(2)
 
-ggplot(bench_jaws, aes(x = Value, y = Group)) +
+p <- ggplot(bench_jaws, aes(x = Value, y = Group)) +
       geom_line(aes(group = Group)) +
       geom_point(aes(color = Stat), size = 3) +
       geom_text(data = bench_right_label, aes(color = Stat, label = round(Value, 1)), size = 5, hjust = -0.5) +
@@ -59,7 +55,6 @@ ggplot(bench_jaws, aes(x = Value, y = Group)) +
       )
 
 
-
 # Boone
 # 3 group plot
 
@@ -73,7 +68,7 @@ boone_left_label <- boone_jaws %>%
       arrange(desc(Value)) %>% 
       slice(2)
 
-ggplot(boone_jaws, aes(x = Value, y = Group)) +
+p <- ggplot(boone_jaws, aes(x = Value, y = Group)) +
       geom_line(aes(group = Group)) +
       geom_point(aes(color = Stat), size = 3) +
       geom_text(data = boone_right_label, aes(color = Stat, label = round(Value, 1)), size = 5, hjust = -0.5) +
@@ -96,6 +91,8 @@ ggplot(boone_jaws, aes(x = Value, y = Group)) +
 
 
 
+
+
 # Line Chart ====================================================
 
 war_combo_avg <- read_rds("data/18 - JAWS pg line chart table.rds")
@@ -108,9 +105,9 @@ bench_war <- war_combo_avg %>%
 bench_filtered <- bench_war %>% 
       filter(type == "WAR4")
 
-ggplot(data = bench_war) + 
-      geom_point(aes(x = yearId, y = WAR, group = type), color = alpha("#000000", 0.5)) +
-      geom_point(data = bench_filtered, aes(x = yearId, y = WAR, color = type), size = 2.5, shape = 17) +
+p <- ggplot(data = bench_war) + 
+      geom_point_interactive(aes(x = yearId, y = WAR, group = type, tooltip = WAR), color = alpha("#000000", 0.5)) +
+      geom_point_interactive(data = bench_filtered, aes(x = yearId, y = WAR, color = type, tooltip = WAR), size = 2.5, shape = 17) +
       geom_line(aes(x = yearId, y = WAR)) +
       geom_hline(aes(yintercept = mean(`Median WAR`), linetype = "Typical HOFer"), color = alpha("#C6011F", 0.5), size = 1.25) +
       scale_linetype_manual(values = 2, guide = guide_legend(override.aes = list(color = "#C6011F"))) +
@@ -130,7 +127,7 @@ ggplot(data = bench_war) +
             plot.title = element_text(size = 20, margin = margin(b = 10))
       )
 
-
+ggiraph(ggobj = p)
 
 # Reggie Sanders
 
