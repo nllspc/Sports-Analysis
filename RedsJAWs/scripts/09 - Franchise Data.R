@@ -138,7 +138,7 @@ write_rds(tradFranBat, "data/09 - franchiseTradBatting.rds")
 
 # BBRef
 
-redsFranPit <- read_csv("./09 - bbref Franchise Pitching.csv")
+redsFranPit <- read_csv("data/csv/09 - bbref Franchise Pitching.csv")
 
 
 # Same as with Batting
@@ -177,7 +177,7 @@ bbrefFranPit <- redsFranPit %>%
 
 # FanGraphs
 
-fgFranPit_dat <- read_csv("./09 - FanGraphs Franchise Pitching.csv")
+fgFranPit_dat <- read_csv("data/csv/09 - FanGraphs Franchise Pitching.csv")
 
 # Some naming conflicts but no one is left out
 missing_pitchers <- setdiff(bbrefFranPit$name_whole, fgFranPit_dat$Name)
@@ -191,6 +191,19 @@ missing_pitchers3 <- setdiff(bbrefFranPit$name_whole, fgFranPit$Name)
 missing_pitchers4 <- setdiff(fgFranPit$Name, bbrefFranPit$name_whole)
 
 
+# add-in fWAR; forgot to filter IP > 499 at the sit.
+fWar <- read_csv("data/csv/09 - FanGraphs Pitching fWAR.csv") %>% 
+      filter(IP > 499) %>% 
+      select(playerid, Name, WAR) %>% 
+      rename(fWAR = WAR) %>% 
+      mutate(Name = if_else(Name == "Elmer Smith", "Mike Smith", Name), Name = if_else(Name == "Junior Thompson", "Gene Thompson", Name), Name = if_else(Name == "Elton Chamberlain", "Ice Box Chamberlain", Name))
+
+# All good
+missing_pitchers <- setdiff(bbrefFranPit$name_whole, fWar$Name)
+missing_pitchers2 <- setdiff(fWar$Name, bbrefFranPit$name_whole)
+
+fgFranPit <- fgFranPit %>% 
+      inner_join(fWar, by = c("playerid", "Name"))
 # Combine Stats
 
 # Swapping, copying, and discarding columns

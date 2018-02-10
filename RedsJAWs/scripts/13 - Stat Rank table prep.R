@@ -25,6 +25,16 @@ tradFranPit <- read_rds("data/09 - tradFranchisePitching.rds")
 
 
 
+# Display table ====================================
+
+# All look good for display
+fran_bat <- read_rds("data/13 - Franchise Batting.rds")
+hof_bat <- read_rds("data/13 - HOF Batting.rds")
+fran_pit <- read_rds("data/13 - Franchise Pitching.rds")
+hof_pit <- read_rds("data/13 - HOF Pitching.rds")
+
+
+
 # Batting ==================================================================
 
 # Probably want 2 sets of tables with each set having two tables. 1 set with ranks and percentages for HOF and Franchise and the other with stats for HOF and Franchise. Then do it again for pitching.
@@ -216,19 +226,36 @@ firstElt <- function(x) {x[1]}
 franchise_pitching$K_perc <- sapply(K_perc, firstElt)
 franchise_pitching$BB_perc <- sapply(BB_perc, firstElt)
 franchise_pitching$K_BB_perc <- sapply(K_BB_perc, firstElt)
+
+fp_withIds <- franchise_pitching %>% 
+      mutate('K%' = as.numeric(K_perc), 'BB%' = as.numeric(BB_perc), 'K-BB%' = as.numeric(K_BB_perc)) %>% 
+      select(-K_perc, -BB_perc, -K_BB_perc)
+
 franchise_pitching <- franchise_pitching %>% 
       mutate('K%' = as.numeric(K_perc), 'BB%' = as.numeric(BB_perc), 'K-BB%' = as.numeric(K_BB_perc)) %>% 
       select(-K_perc, -BB_perc, -K_BB_perc, -bbref_id, -fg_id, -From, -To)
+
+
+
+# Needed for HOF table which is needed for Numbers pg
+write_rds(fp_withIds, "data/13 - Franchise Pitching wIds.rds")
 
 write_rds(franchise_pitching, "data/13 - Franchise Pitching.rds")
 
 # HOF Table
 
-hof_pitching <- map_dfr(inWandJp$playerId, function(x) {filter(franchise_pitching, bbref_id == x)})
+hp_withIds <- map_dfr(inWandJp$playerId, function(x) {filter(fp_withIds, bbref_id == x)})
+hof_pitching <- hp_withIds %>% 
+      select(-bbref_id, -fg_id, -From, -To)
+
 missing_hof <- setdiff(hof_pitching$bbref_id, inWandJp$playerId)
 missing_wj <- setdiff(inWandJp$playerId, hof_pitching$bbref_id)
 
+# Needed for Numbers pg
+write_rds(hp_withIds, "data/13 - HOF Pitching wIds.rds")
+
 write_rds(hof_pitching, "data/13 - HOF Pitching.rds")
+
 
 
 # Rank Franchise, HOF Pitching ===========================
@@ -242,27 +269,27 @@ franp_rank_perc_FUN <- function(x) {
       median_var <- paste0("median_", x)
       
       if(x %in% c("L", "ERA", "ERA-", "FIP-", "xFIP-", "WHIP", "SIERA", "BB/9", "HR/9", "BB%", "AVG")) {
-            franchise_pitching %>%
+            fp_withIds %>%
                   mutate(!!rank_var := min_rank(!! rlang::sym(x)), !!perc_var := round(percent_rank(desc(!! rlang::sym(x))) * 100, 0), !!median_var := median(!! rlang::sym(x), na.rm = TRUE)) %>% 
                   select(rank_var, perc_var)
       } else {
-            franchise_pitching %>%
+            fp_withIds %>%
                   mutate(!!rank_var := min_rank(desc(!! rlang::sym(x))), !!perc_var := round(percent_rank(!! rlang::sym(x)) * 100, 0), !!median_var := median(!! rlang::sym(x), na.rm = TRUE)) %>% 
                   select(rank_var, perc_var, median_var)
       }
 }
 
-franp_id_cols <- franchise_pitching %>% 
+franp_id_cols <- fp_withIds %>% 
       select(bbref_id, Name)
 
-franp_col_names <- names(franchise_pitching)
+franp_col_names <- names(fp_withIds)
 franp_col_names <- franp_col_names[-c(1,2,3,5,6)]
 franp_rank_perc <- map_dfc(franp_col_names, franp_rank_perc_FUN) %>% 
       bind_cols(franp_id_cols) %>% 
       select(bbref_id, Name, everything())
 write_rds(franp_rank_perc, "data/13 - franchise pitching ranks.rds")
 
-franp_stats_rank <- franchise_pitching %>% 
+franp_stats_rank <- fp_withIds %>% 
       inner_join(franp_rank_perc[-2], by = "bbref_id")
 write_rds(franp_stats_rank, "data/13 - Franchise Pitching Stats and Ranks.rds")
 
@@ -275,27 +302,28 @@ hofp_rank_perc_FUN <- function(x) {
       median_var <- paste0("median_", x)
       
       if(x %in% c("L", "ERA", "ERA-", "FIP-", "xFIP-", "WHIP", "SIERA", "BB/9", "HR/9", "BB%", "AVG")) {
-            hof_pitching %>%
+            hp_withIds %>%
                   mutate(!!rank_var := min_rank(!! rlang::sym(x)), !!perc_var := round(percent_rank(desc(!! rlang::sym(x))) * 100, 0), !!median_var := median(!! rlang::sym(x), na.rm = TRUE)) %>% 
                   select(rank_var, perc_var)
       } else {
-            hof_pitching %>%
+            hp_withIds %>%
                   mutate(!!rank_var := min_rank(desc(!! rlang::sym(x))), !!perc_var := round(percent_rank(!! rlang::sym(x)) * 100, 0), !!median_var := median(!! rlang::sym(x), na.rm = TRUE)) %>% 
                   select(rank_var, perc_var, median_var)
       }
 }
 
-hofp_id_cols <- hof_pitching %>% 
+hofp_id_cols <- hp_withIds %>% 
       select(bbref_id, Name)
 
-hofp_col_names <- names(hof_pitching)
+hofp_col_names <- names(hp_withIds)
 hofp_col_names <- hofp_col_names[-c(1,2,3,5,6)]
 hofp_rank_perc <- map_dfc(hofp_col_names, hofp_rank_perc_FUN) %>% 
       bind_cols(hofp_id_cols) %>% 
       select(bbref_id, Name, everything())
+
 write_rds(hofp_rank_perc, "data/13 - hof pitching ranks.rds")
 
 
-hofp_stats_rank <- hof_pitching %>% 
+hofp_stats_rank <- hp_withIds %>% 
       inner_join(hofp_rank_perc[-2], by = "bbref_id")
 write_rds(hofp_stats_rank, "data/13 - HOF Pitching Stats and Ranks.rds")

@@ -72,6 +72,7 @@ fran_num <- franchise_batting[-54,] %>%
       arrange(bbref_playerId) %>% 
       select(-CS)
 
+# Values have % symbol included. Getting rid of it
 K_num <- strsplit(fran_num$`K%`, " ", fixed = TRUE)
 BB_num <- strsplit(fran_num$`BB%`, " ", fixed = TRUE)
 
@@ -88,18 +89,40 @@ fran_num <- fran_num %>%
 fran_num <- fran_num %>% 
       select(bbref_playerId:BB, `BB%`, SO, `K%`, everything())
 
+
 hof_num <- map_dfr(inWandJb$playerId, function(x) {filter(fran_num, bbref_playerId == x)}) %>% 
       rename(`BBRef Id` = bbref_playerId, `FG Id` = fg_playerId) %>% 
       arrange(`BBRef Id`)
 
+# Add bWAR and JAWS4 column
+wandj_b <- inWandJb %>% 
+      select(playerId, redsWAR, redsJAWS) %>% 
+      rename(`BBRef Id` = playerId, WAR = redsWAR, JAWS4 = redsJAWS)
+
+hof_num <- hof_num %>% 
+      inner_join(wandj_b, by = "BBRef Id")
 
 write_rds(hof_num, "data/20 - Numbers pg HOF Batting.rds")
 
-# Pitching ====
-num_hof_pitching <- read_rds("data/13 - HOF Pitching.rds") %>% 
-      rename(`BBRef Id` = bbref_id, `FG Id` = fg_id)
-write_rds(num_hof_pitching, "data/20 - Numbers pg HOF Pitching.rds")
 
+
+
+# Pitching ====
+
+
+num_hof_pitching <- read_rds("data/13 - HOF Pitching wIds.rds") %>% 
+      rename(`BBRef Id` = bbref_id, `FG Id` = fg_id)
+
+# add bWAR and JAWS4 columns
+wandj_p <- inWandJp %>% 
+      select(playerId, redsWAR, redsJAWS) %>% 
+      rename(`BBRef Id` = playerId, WAR = redsWAR, JAWS4 = redsJAWS)
+
+num_hof_pitching <- num_hof_pitching %>% 
+      inner_join(wandj_p, by = "BBRef Id") %>% 
+      select(`BBRef Id`:`K/BB`, `K%`, `BB%`, `K-BB%`, `HR/9`, everything())
+
+write_rds(num_hof_pitching, "data/20 - Numbers pg HOF Pitching.rds")
 
 
 # Season ======================================================

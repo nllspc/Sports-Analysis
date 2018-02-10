@@ -63,7 +63,7 @@ iRedsWandJ <- iRedsWandJ %>%
       filter(POS != "OF") %>%
       bind_rows(ofWandJ)
 
-write_rds(iRedsWandJ, "data/indRedsWARandJAWS.rds")
+write_rds(iRedsWandJ, "data/05 06 07b - indRedsWARandJAWS.rds")
 
 
 
@@ -103,11 +103,12 @@ middledf <- iRedsWandJ %>%
 other_Groups <- cornerIFdf %>% 
       bind_rows(middleIFdf, outFielddf, cornersdf, middledf)
 
-write_rds(other_Groups, "data/otherGroupDistributions.rds")
+write_rds(other_Groups, "data/07b - otherGroupDistributions.rds")
 
 # Summarized Values ============
 # Will need these for a comparison table
 
+iRedsWandJ <- read_rds("data/05 06 07b - indRedsWARandJAWS.rds")
 
 cornerIF <- iRedsWandJ %>% 
       filter(POS == "1B" | POS == "3B") %>% 
@@ -137,7 +138,7 @@ middle <- iRedsWandJ %>%
 group_Summary <- cornerIF %>% 
       bind_rows(middleIF, outField, corners, middle)
 
-write_rds(group_Summary, "data/otherGroupSummary.rds")
+write_rds(group_Summary, "data/07b - otherGroupSummary.rds")
 
 
 
@@ -201,5 +202,5 @@ nRedsWandJ <- nRedsWandJ %>%
       filter(POS != "OF") %>%
       bind_rows(nofWandJ)
 
-write_rds(nRedsWandJ, "data/nomRedsWARandJAWS.rds")
+write_rds(nRedsWandJ, "data/05 06 07b - nomRedsWARandJAWS.rds")
 
