@@ -6,6 +6,14 @@ library(tidyverse)
 library(knitr)
 library(kableExtra)
 
+
+# Ridge Plot Table ==============================================
+
+bothDistrb <- read_rds("data/unweightedandGroupJoyplot.rds")
+
+
+# Kable Table Creation ==========================================
+
 # Group averages
 other_summary <- read_rds("data/07b - otherGroupSummary.rds") %>% 
       rename(WARtenure = redsWAR, WAR4 = redsWAR4, JAWS4 = redsJAWS, Position = Group, Number = number) %>%
@@ -33,7 +41,9 @@ write_rds(jaws_ref_table, "data/17 - JAWS Reference Table.rds")
 
 
 
-# kable table
+# kable table =================================================
+
+jaws_ref_table <- read_rds("data/17 - JAWS Reference Table.rds")
 
 kable_jaws_tbl <- kable(jaws_ref_table, "html") %>% 
       kable_styling() %>% 

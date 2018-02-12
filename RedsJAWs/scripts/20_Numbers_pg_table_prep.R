@@ -235,8 +235,8 @@ ps_pit <- read_rds("data/11 - careerRedsPostseasonPit.rds") %>%
       select(`BBRef Id`, `FG Id`, Name, W:CG, IP, SHO:H, R, everything())
 
 
-write_csv(ps_bat, "data/20 - Numbers pg HOF Postseason Batting.rds")
-write_csv(ps_pit, "data/20 - Numbers pg HOF Postseason Pitching.rds")
+write_rds(ps_bat, "data/20 - Numbers pg HOF Postseason Batting.rds")
+write_rds(ps_pit, "data/20 - Numbers pg HOF Postseason Pitching.rds")
 
 
 

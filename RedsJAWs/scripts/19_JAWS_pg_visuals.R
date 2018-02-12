@@ -7,6 +7,9 @@ library(tidyverse)
 library(ggiraph)
 
 
+# Display Table ==============================================
+
+wj_display <- read_rds("data/18 - JAWS pg display table.rds")
 
 
 # Cleveland Dot ==============================================

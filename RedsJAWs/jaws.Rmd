@@ -1,0 +1,86 @@
+---
+title: JAWS-4
+output:
+        flexdashboard::flex_dashboard:
+                orientation: columns
+                vertical_layout: fill
+                self_contained: true
+runtime: shiny
+---
+
+
+
+```{r load-packages, cache=TRUE}
+library(tidyverse)
+
+# JAWS Reference Table
+library(knitr)
+library(kableExtra)
+
+# Ridge Plots
+library(ggridges)
+library(viridis)
+library(cowplot)
+library(ggbeeswarm)
+
+# Interactive Line Chart
+library(ggiraph)
+```
+
+
+
+
+```{r load-data, cache=TRUE}
+
+# Home Page =============
+jaws_ref_table <- read_rds("data/17 - JAWS Reference Table.rds")
+bothDistrb <- read_rds("data/08 - unweightedandGroupJoyplot.rds")
+
+# JAWS Page =============
+
+# Table
+wj_display <- read_rds("data/18 - JAWS pg display table.rds")
+
+# Cleveland Dot Plots
+jaws_group <- read_rds("data/18 - JAWS pg JAWS dot chart table.rds")
+war_group <- read_rds("data/18 - JAWS pg WAR dot chart table.rds")
+
+# Line Chart
+war_combo_avg <- read_rds("data/18 - JAWS pg line chart table.rds")
+
+```
+
+
+# Home Page
+
+## Reference Table
+``` {r ref-table}
+renderTable(jaws_ref_table)
+```
+
+## Ridge Plots
+
+``` {r ridg}
+
+renderPlot(ggplot(data = bothDistrb,
+                  aes(y = forcats::fct_relevel(POSf, "Reds HOF", "Md", "CO", "OF", "MI", "CI", "RF", "CF", "LF", "SS", "3B", "2B", "1B", "C", "P"),
+                      x = redsJAWS,
+                      color = redsJAWS,
+                      fill = ..x..)) +
+      geom_density_ridges_gradient(rel_min_height = 0.01,
+                                   alpha = 0.75)  +
+      scale_fill_viridis(option = "C",
+                         name = "Reds JAWS") +
+      scale_color_viridis(option = "C") +
+      guides(color = F) +
+      theme_ridges() +
+      theme(legend.position = "top",
+            plot.caption = element_text(hjust=0),
+            legend.key.width = unit(1.25, "cm")) +
+      labs(x = "Reds JAWS", y = "Group",
+           title = "Reds HOF JAWS Distributions")
+)
+
+```
+
+

@@ -1,5 +1,5 @@
 # Profile table prep
-
+# Display table section at the bottom
 
 library(tidyverse)
 library(caret)
@@ -141,3 +141,30 @@ write_rds(final_pfp, "data/14 - pos normalization fran pitching.rds")
 write_rds(final_phb, "data/14 - pos normalization hof batting.rds")
 write_rds(final_php, "data/14 - pos normalization hof pitching.rds")
 
+
+
+# Display Tables ============================================
+
+# Depending on how it looks, I might include season, shares
+seas_bat <- read_rds("data/20 - Numbers pg HOF seas Batting.rds") %>% 
+      select(-`BBRef Id`, -`FG Id`)
+seas_pit <- read_rds("data/20 - Numbers pg HOF seas Pitching.rds") %>% 
+      select(-`BBRef Id`, -`FG Id`)
+# Maybe double column this with awards
+shares <- read_rds("data/20 - Numbers pg HOF Award Shares.rds") %>% 
+      select(-`BBRef Id`, -`FG Id`)
+
+# Batting tab
+batting <- read_rds("data/13 - HOF Batting.rds")
+fielding <- read_rds("data/20 - Numbers pg HOF Fielding.rds")
+postseas_b <- read_rds("data/20 - Numbers pg HOF Postseason Batting.rds") %>% 
+      select(-`BBRef Id`, -`FG Id`)
+awards <- read_rds("data/20 - Numbers pg HOF Awards.rds") %>%
+      select(-`BBRef Id`, -`FG Id`)
+
+# Pitching
+pitching <- read_rds("data/13 - HOF Pitching.rds")
+postseas_p <- read_rds("data/20 - Numbers pg HOF Postseason Pitching.rds") %>% 
+      select(-`BBRef Id`, -`FG Id`)
+awards <- read_rds("data/20 - Numbers pg HOF Awards.rds") %>% 
+      select(-`BBRef Id`, -`FG Id`)

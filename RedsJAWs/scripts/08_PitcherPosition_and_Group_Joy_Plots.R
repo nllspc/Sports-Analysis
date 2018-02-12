@@ -9,14 +9,14 @@ library(ggbeeswarm)
 
 
 # Combining Pitcher and weighted position player distributions
-batPosDistrbWt <- read_rds("data/weightedPositionDistributions.rds")
-pitPosDistrb <- read_rds("data/pitcherPositionDistribution.rds") %>% 
+batPosDistrbWt <- read_rds("data/07a - weightedPositionDistributions.rds")
+pitPosDistrb <- read_rds("data/07a - pitcherPositionDistribution.rds") %>% 
       select(name_whole, redsWAR, redsWAR4, redsJAWS, POS)
 
 wtCompPosDistrb <- bind_rows(batPosDistrbWt,pitPosDistrb)
 wtCompPosDistrb$POSf <- as.factor(compPosDistrb$POS)
 
-write_rds(wtCompPosDistrb, "data/weightedPositionJoyPlot.rds")
+write_rds(wtCompPosDistrb, "data/08 - weightedPositionJoyPlot.rds")
 
 
 
@@ -57,7 +57,7 @@ wtJoyPOS
 compPosDistrb <- wtCompPosDistrb %>% 
       filter(name_whole != "avgHOFplayer")
 
-write_rds(compPosDistrb, "data/positionJoyPlot.rds")
+write_rds(compPosDistrb, "data/08 - positionJoyPlot.rds")
 
 
 # 3B only has 2 players so no density plot
@@ -86,7 +86,7 @@ joyPOS
 
 # Groups ==============================================
 
-otherGroups <- read_rds("data/otherGroupDistributions.rds")
+otherGroups <- read_rds("data/07b - otherGroupDistributions.rds")
 
 # Adding HOF distribution
 compPosDistrbA <- compPosDistrb %>% 
@@ -141,7 +141,7 @@ groupDistrbB <- groupDistrb %>%
 bothDistrb <- bind_rows(compPosDistrbB, groupDistrbB) %>% 
       mutate(POSf = as.factor(POS))
 
-write_rds(bothDistrb, "data/unweightedandGroupJoyplot.rds")
+write_rds(bothDistrb, "data/08 - unweightedandGroupJoyplot.rds")
 
 
 bothJoy <- ggplot(data = bothDistrb,
