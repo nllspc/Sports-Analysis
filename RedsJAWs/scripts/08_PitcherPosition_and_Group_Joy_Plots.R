@@ -141,6 +141,7 @@ groupDistrbB <- groupDistrb %>%
 bothDistrb <- bind_rows(compPosDistrbB, groupDistrbB) %>% 
       mutate(POSf = as.factor(POS))
 
+# Changed this file in the next section below
 write_rds(bothDistrb, "data/08 - unweightedandGroupJoyplot.rds")
 
 
@@ -172,23 +173,27 @@ bothJoy
 
 # Without Jitter points ===========
 
+# No legend (guide(fill = F)), no axis labels(axis.title.x/y)
+# Changing Reds HOF -> HOF to reduce left margin
+bothDistrb <- bothDistrb %>% 
+      select(-POSf) %>% 
+      mutate(POS = if_else(POS == "Reds HOF", "HOF", POS))
+bothDistrb$POSf <- as.factor(bothDistrb$POS)
 
-altBothJoy <- ggplot(data = bothDistrb,
-                  aes(y = forcats::fct_relevel(POSf, "Reds HOF", "Md", "CO", "OF", "MI", "CI", "RF", "CF", "LF", "SS", "3B", "2B", "1B", "C", "P"),
-                      x = redsJAWS,
-                      color = redsJAWS,
-                      fill = ..x..)) +
+write_rds(bothDistrb, "data/08 - unweightedandGroupJoyplot.rds")
+
+ggplot(data = bothDistrb,
+       aes(y = forcats::fct_relevel(POSf, "HOF", "Md", "CO", "OF", "MI", "CI", "RF", "CF", "LF", "SS", "3B", "2B", "1B", "C", "P"),
+           x = redsJAWS,
+           color = redsJAWS,
+           fill = ..x..)) +
       geom_density_ridges_gradient(rel_min_height = 0.01,
                                    alpha = 0.75)  +
-      scale_fill_viridis(option = "C",
-                         name = "Reds JAWS") +
+      scale_fill_viridis(option = "C") +
       scale_color_viridis(option = "C") +
-      guides(color = F) +
+      guides(fill = F) +
       theme_ridges() +
-      theme(legend.position = "top",
-            plot.caption = element_text(hjust=0),
-            legend.key.width = unit(1.25, "cm")) +
-      labs(x = "Reds JAWS", y = "Group",
-           title = "Reds HOF JAWS Distributions")
+      theme(axis.title.x = element_blank(),
+            axis.title.y = element_blank()) +
+      labs(title = "Reds HOF JAWS-4 Distributions")
 
-altBothJoy

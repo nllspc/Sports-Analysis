@@ -4,6 +4,8 @@
 
 library(shiny)
 library(shinydashboard)
+library(DT)
+library(ggiraph)
 
 
 
@@ -74,7 +76,16 @@ dashBody <- dashboardBody(
       tabItems(
             tabItem(
                   tabName = 'homeTab',
-                  'Home'
+                  fluidRow(
+                        box(
+                              width = 8,
+                              DTOutput(outputId = 'hTable')
+                        ),
+                        box(
+                              width = 4,
+                              plotOutput(outputId = 'ridge')
+                        )
+                  )
             ),
             
             tabItem(
@@ -82,20 +93,19 @@ dashBody <- dashboardBody(
                   fluidRow(
                         box(
                               width = 6,
-                              collapsible = TRUE,
                               
+                              
+                              DTOutput(outputId = 'jTable')
+                              
+                        ),
+                        
+                        box(
+                              width = 6,
                               textInput(
                                     inputId = 'jplayer',
                                     label = 'Enter Player Name',
                                     placeholder = 'Johnny Bench'
                               ),
-                              
-                              DTOutput(outputId = 'jTable')
-                        ),
-                        
-                        box(
-                              width = 6,
-                              collapsible = TRUE,
                               
                               ggiraphOutput(outputId = 'lineChart'),
                               
@@ -103,21 +113,68 @@ dashBody <- dashboardBody(
                                     width = 6,
                                     plotOutput(outputId = 'warCleve')
                               ),
-                              
                               box(
                                     width = 6,
                                     plotOutput(outputId = 'jawsCleve')
                               )
+                              
+                              
                         )
                   )
             ),
+      
             
             tabItem(
                   tabName = 'profTab',
-                  textInput(
-                        inputId = 'pplayer',
-                        label = 'Enter Player Name',
-                        placeholder = 'Ken Griffey Jr'
+                  fluidRow(
+                        tabBox(
+                              width = 12,
+                              tabPanel(
+                                    title = 'Batting',
+                                    column(
+                                          width = 7,
+                                          box(
+                                                textInput(
+                                                      inputId = 'prof_bat_player',
+                                                      label = 'Enter Player Name',
+                                                      placeholder = 'Ken Griffey Jr'
+                                                ),
+                                                DTOutput(outputId = 'prof_bat_Table'),
+                                                DTOutput(outputId = 'prof_field_Table'),
+                                                DTOutput(outputId = 'prof_psb_Table'),
+                                                DTOutput(outputId = 'prof_awa_Table')
+                                          )
+                                    ),
+                                    column(
+                                          width = 5,
+                                          box(
+                                                plotOutput(outputId = 'bat_dev')
+                                          )
+                                    )
+                              ),
+                              tabPanel(
+                                    title = 'Pitching',
+                                    column(
+                                          width = 7,
+                                          box(
+                                                textInput(
+                                                      inputId = 'prof_pit_player',
+                                                      label = 'Enter Player Name',
+                                                      placeholder = 'Jose Rijo'
+                                                ),
+                                                DTOutput(outputId = 'prof_pit_Table'),
+                                                DTOutput(outputId = 'prof_psb_Table'),
+                                                DTOutput(outputId = 'prof_awa_Table')
+                                          )
+                                    ),
+                                    column(
+                                          width = 5,
+                                          box(
+                                                plotOutput(outputId = 'pit_dev')
+                                          )
+                                    )
+                              )
+                        )
                   )
             ),
             
