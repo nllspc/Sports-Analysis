@@ -71,7 +71,17 @@ dashBody <- dashboardBody(
                             }
                             
                             '))
+            
       ),
+      
+      tags$style(HTML("
+                  .box.box-solid.box-primary>.box-header {
+                  }
+                  .box.box-solid.box-primary{
+                  color:#fff;
+                  background:#C6011F
+                  }
+                ")),
       
       tabItems(
             tabItem(
@@ -92,7 +102,7 @@ dashBody <- dashboardBody(
                   tabName = 'jawsTab',
                   fluidRow(
                         box(
-                              width = 6,
+                              width = 4,
                               
                               
                               DTOutput(outputId = 'jTable')
@@ -100,14 +110,12 @@ dashBody <- dashboardBody(
                         ),
                         
                         box(
-                              width = 6,
+                              width = 4,
                               textInput(
                                     inputId = 'jplayer',
                                     label = 'Enter Player Name',
                                     placeholder = 'Johnny Bench'
                               ),
-                              
-                              ggiraphOutput(outputId = 'lineChart'),
                               
                               box(
                                     width = 6,
@@ -117,9 +125,15 @@ dashBody <- dashboardBody(
                                     width = 6,
                                     plotOutput(outputId = 'jawsCleve')
                               )
+                        ),
+                        
+                        box(
+                              width = 4,
                               
-                              
+                              ggiraphOutput(outputId = 'lineChart')
                         )
+                        
+                        
                   )
             ),
       
@@ -131,47 +145,40 @@ dashBody <- dashboardBody(
                               width = 12,
                               tabPanel(
                                     title = 'Batting',
-                                    column(
+                                    box(
                                           width = 7,
-                                          box(
-                                                textInput(
-                                                      inputId = 'prof_bat_player',
-                                                      label = 'Enter Player Name',
-                                                      placeholder = 'Ken Griffey Jr'
-                                                ),
-                                                DTOutput(outputId = 'prof_bat_Table'),
-                                                DTOutput(outputId = 'prof_field_Table'),
-                                                DTOutput(outputId = 'prof_psb_Table'),
-                                                DTOutput(outputId = 'prof_awa_Table')
-                                          )
+                                          DTOutput(outputId = 'prof_bat_Table'),
+                                          DTOutput(outputId = 'prof_field_Table'),
+                                          DTOutput(outputId = 'prof_psb_Table')
                                     ),
-                                    column(
+                                    
+                                    box(
                                           width = 5,
-                                          box(
-                                                plotOutput(outputId = 'bat_dev')
-                                          )
+                                          textInput(
+                                                inputId = 'prof_bat_player',
+                                                label = 'Enter Player Name',
+                                                value = 'Ken Griffey Jr'
+                                          ),
+                                          plotOutput(outputId = 'bat_dev'),
+                                          DTOutput(outputId = 'prof_awab_Table')
                                     )
                               ),
                               tabPanel(
                                     title = 'Pitching',
-                                    column(
+                                    box(
                                           width = 7,
-                                          box(
-                                                textInput(
-                                                      inputId = 'prof_pit_player',
-                                                      label = 'Enter Player Name',
-                                                      placeholder = 'Jose Rijo'
-                                                ),
-                                                DTOutput(outputId = 'prof_pit_Table'),
-                                                DTOutput(outputId = 'prof_psb_Table'),
-                                                DTOutput(outputId = 'prof_awa_Table')
-                                          )
+                                          DTOutput(outputId = 'prof_pit_Table'),
+                                          DTOutput(outputId = 'prof_psp_Table'),
+                                          DTOutput(outputId = 'prof_awap_Table')
                                     ),
-                                    column(
+                                    box(
                                           width = 5,
-                                          box(
-                                                plotOutput(outputId = 'pit_dev')
-                                          )
+                                          textInput(
+                                                inputId = 'prof_pit_player',
+                                                label = 'Enter Player Name',
+                                                value = 'Jose Rijo'
+                                          ),
+                                          plotOutput(outputId = 'pit_dev')
                                     )
                               )
                         )
@@ -180,10 +187,84 @@ dashBody <- dashboardBody(
             
             tabItem(
                   tabName = 'rankTab',
-                  textInput(
-                        inputId = 'rplayer',
-                        label = 'Enter Player Name',
-                        placeholder = 'Eric Davis'
+                  fluidRow(
+                        tabBox(
+                              width = 12,
+                              tabPanel(
+                                    title = 'Batting',
+                                    box(
+                                          width = 6,
+                                          
+                                          DTOutput(outputId = 'sr_hof_bTable'),
+                                          DTOutput(outputId = 'sr_fran_bTable')
+                                          
+                                    ),
+                                    box(
+                                          width = 6,
+                                          box(
+                                                width = 6,
+                                                textInput(
+                                                      inputId = 'r_bat_player',
+                                                      label = 'Enter Player Name',
+                                                      value = 'Eric Davis'
+                                                ),
+                                                htmlOutput("hof_bvalue_box"),
+                                                plotOutput(outputId = 'hof_bat_dens')
+                                          ),
+                                          box(
+                                                width = 6,
+                                                textInput(
+                                                      inputId = 'r_bat_stat',
+                                                      label = 'Enter Statistic',
+                                                      value = 'wRC+'
+                                                ),
+                                                
+                                                htmlOutput("fran_bvalue_box"),
+                                                plotOutput(outputId = 'fran_bat_dens')
+                                                
+                                          )
+                                    )
+                              ),
+                              
+                              tabPanel(
+                                    title = 'Pitching',
+                                    box(
+                                          width = 6,
+                                          
+                                          DTOutput(outputId = 'sr_hof_pTable'),
+                                          DTOutput(outputId = 'sr_fran_pTable')
+                                          
+                                    ),
+                                    
+                                    box(
+                                          width = 6,
+                                          box(
+                                                width = 6,
+                                                status = "primary",
+                                                solidHeader = TRUE,
+                                                textInput(
+                                                      inputId = 'r_pit_player',
+                                                      label = 'Enter Player Name',
+                                                      value = 'Bucky Walters'
+                                                ),
+                                                htmlOutput("hof_pvalue_box"),
+                                                plotOutput(outputId = 'hof_pit_dens')
+                                          ),
+                                          box(
+                                                width = 6,
+                                                textInput(
+                                                      inputId = 'r_pit_stat',
+                                                      label = 'Enter Statistic',
+                                                      value = 'ERA+'
+                                                ),
+                                                htmlOutput("fran_pvalue_box"),
+                                                plotOutput(outputId = 'fran_pit_dens')
+                                          )
+                                    )
+                              )
+                              
+                        )
+                        
                   )
             ),
             

@@ -156,15 +156,22 @@ shares <- read_rds("data/20 - Numbers pg HOF Award Shares.rds") %>%
 
 # Batting tab
 batting <- read_rds("data/13 - HOF Batting.rds")
-fielding <- read_rds("data/20 - Numbers pg HOF Fielding.rds")
+
+fielding <- read_rds("data/20 - Numbers pg HOF Fielding.rds") %>% 
+      select(-`BBRef Id`, -`FG Id`) %>% 
+      select(Name, everything())
+write_rds(fielding, "data/14 - Fielding display table.rds")
+
 postseas_b <- read_rds("data/20 - Numbers pg HOF Postseason Batting.rds") %>% 
       select(-`BBRef Id`, -`FG Id`)
+write_rds(postseas_b, "data/14 - Postseason batting display table.rds")
+
 awards <- read_rds("data/20 - Numbers pg HOF Awards.rds") %>%
       select(-`BBRef Id`, -`FG Id`)
+write_rds(awards, "data/14 - Awards display table.rds")
 
-# Pitching
+# Pitching tab
 pitching <- read_rds("data/13 - HOF Pitching.rds")
 postseas_p <- read_rds("data/20 - Numbers pg HOF Postseason Pitching.rds") %>% 
       select(-`BBRef Id`, -`FG Id`)
-awards <- read_rds("data/20 - Numbers pg HOF Awards.rds") %>% 
-      select(-`BBRef Id`, -`FG Id`)
+write_rds(postseas_p, "data/14 - Postseason pitching display table.rds")

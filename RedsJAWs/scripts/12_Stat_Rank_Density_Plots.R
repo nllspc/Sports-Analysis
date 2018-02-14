@@ -155,10 +155,10 @@ p
 hof_density_FUN <- function(play_sel, col_sel) {
       
       # Density calculation
-      df2 <-  hof_bat %>%
+      df2 <-  fran_pit %>%
             select(Name) %>% 
             group_by(Name) %>%
-            do(tidy(density(hof_bat[, col_sel][[1]], bw = "nrd0", na.rm = TRUE))) %>% 
+            do(tidy(density(fran_pit[, col_sel][[1]], bw = "nrd0", na.rm = TRUE))) %>% 
             group_by() %>% 
             mutate(ymin = max(y) / 1.5, 
                    ymax = y + ymin,
@@ -166,7 +166,7 @@ hof_density_FUN <- function(play_sel, col_sel) {
                    xlabel = min(x) - mean(range(x))/2)
       
       # Median label coords using vars from density calc
-      labels2 <- hof_bat %>% 
+      labels2 <- fran_pit %>% 
             select(Name, !!col_sel) %>% 
             mutate(median = median(!!sym(col_sel), na.rm = TRUE)) %>%
             filter(row_number() == 1) %>% 
@@ -178,19 +178,19 @@ hof_density_FUN <- function(play_sel, col_sel) {
             filter(row_number() == 1)     
       
       # Player stat for shaded area
-      shade_bdy <- hof_bat %>% 
+      shade_bdy <- fran_pit %>% 
             filter(Name == play_sel)
       shade_bdy <- shade_bdy[, col_sel][[1]]
       
       
-      if(col_sel %in% c("wRC+", "BB%", "K%", "OPS+")) {
+      if(col_sel %in% c("W-L%", "ERA-", "FIP-", "xFIP-", "K/9", "BB/9", "K/BB", "HR/9", "K%", "BB%", "K-BB%", "ERA+")) {
             col_sel <- paste0("`", col_sel, "`")
       } else {
             col_sel
       }
       
       # frame
-      a <- ggplot(data = hof_bat, aes_string(x = quo_name(col_sel))) +
+      a <- ggplot(data = fran_pit, aes_string(x = quo_name(col_sel))) +
             geom_density(fill = "#000000", alpha = 0.7) +
             scale_x_continuous() +
             theme(axis.text.y = element_blank())
@@ -209,6 +209,6 @@ hof_density_FUN <- function(play_sel, col_sel) {
       
 }
 
-hof_density_FUN("Reggie Sanders", "wRC+")
+hof_density_FUN("Tom Browning", "ERA+")
 
 

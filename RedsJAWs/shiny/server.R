@@ -5,9 +5,6 @@ library(shiny)
 library(tidyverse)
 library(DT)
 
-# JAWS Reference Table
-library(knitr)
-library(kableExtra)
 
 # Ridge Plots
 library(ggridges)
@@ -18,8 +15,12 @@ library(ggbeeswarm)
 # Interactive Line Chart
 library(ggiraph)
 
-# Cleveland Dot Plots
+# Cleveland Dot Plots and Deviation Chart
 library(ggpubr)
+
+# Needed for Density Plots page
+library(broom)
+library(rlang)
 
 # Data =========================================================
 
@@ -44,36 +45,33 @@ war_combo_avg <- read_rds("data/18 - JAWS pg line chart table.rds")
 
 # Tables
 # Batting
-prof_batting <- read_rds("data/13 - HOF Batting.rds") %>% 
-      filter(Name == input$prof_bat_player)
-prof_fielding <- read_rds("data/20 - Numbers pg HOF Fielding.rds") %>% 
-      select(-`BBRef Id`, -`FG Id`) %>% 
-      select(Name, everything()) %>% 
-      filter(Name == input$prof_bat_player)
-prof_postseas_b <- read_rds("data/20 - Numbers pg HOF Postseason Batting.rds") %>% 
-      select(-`BBRef Id`, -`FG Id`) %>% 
-      filter(Name == input$prof_bat_player)
-prof_awards_b <- read_rds("data/20 - Numbers pg HOF Awards.rds") %>%
-      select(-`BBRef Id`, -`FG Id`) %>% 
-      filter(Name == input$prof_bat_player)
+prof_batting <- read_rds("data/13 - HOF Batting.rds") 
+      
+prof_fielding <- read_rds("data/14 - Fielding display table.rds")
+prof_postseas_b <- read_rds("data/14 - Postseason batting display table.rds")
+prof_awards_b <- read_rds("data/14 - Awards display table.rds")
+
 # Pitching
-prof_pitching <- read_rds("data/13 - HOF Pitching.rds") %>% 
-      filter(Name == input$prof_pit_player)
-prof_postseas_p <- read_rds("data/20 - Numbers pg HOF Postseason Pitching.rds") %>% 
-      select(-`BBRef Id`, -`FG Id`) %>% 
-      filter(Name == input$prof_pit_player)
-prof_awards_p <- read_rds("data/20 - Numbers pg HOF Awards.rds") %>%
-      select(-`BBRef Id`, -`FG Id`) %>% 
-      filter(Name == input$prof_pit_player)
+prof_pitching <- read_rds("data/13 - HOF Pitching.rds")
+prof_postseas_p <- read_rds("data/14 - Postseason pitching display table.rds")
+prof_awards_p <- read_rds("data/14 - Awards display table.rds")
 
 # Deviation Chart
 # Batting
-phb <- read_rds("data/14 - pos normalization hof batting.rds") %>% 
-      filter(Name == input$prof_bat_player)
+phb <- read_rds("data/14 - pos normalization hof batting.rds")
 # Pitching
-php <- read_rds("data/14 - pos normalization hof pitching.rds") %>% 
-      filter(Name == input$prof_pit_player)
+php <- read_rds("data/14 - pos normalization hof pitching.rds")
 
+# Stat Rank Page ================
+
+sr_fran_bat <- read_rds("data/13 - Franchise Batting.rds")
+sr_fran_pit <- read_rds("data/13 - Franchise Pitching.rds")
+
+sr_hof_brank <- read_rds("data/13 - HOF Batting Stats and Ranks.rds")
+sr_hof_prank <- read_rds("data/13 - HOF Pitching Stats and Ranks.rds")
+
+sr_fran_brank <- read_rds("data/13 - Franchise Batting Stats and Ranks.rds")
+sr_fran_prank <- read_rds("data/13 - Franchise Pitching Stats and Ranks.rds")
 
 # Server =======================================================
 
@@ -87,11 +85,17 @@ shinyServer(function(input, output, session){
                   rownames = FALSE,
                   extensions = c("FixedColumns","Buttons"),
                   options = list(language = list(sSearch = "Filter:"),
-                                 buttons = c("colvis", "csv"),
+                                 buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip")
-            )
+                                 dom = ("Bfrtip"),
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+                                 
+                  )
       })
       
       
@@ -121,10 +125,15 @@ shinyServer(function(input, output, session){
                   rownames = FALSE,
                   extensions = c("FixedColumns","Buttons"),
                   options = list(language = list(sSearch = "Filter:"),
-                                 buttons = c("colvis", "csv"),
+                                 buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip")
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
             )
       })
       
@@ -161,7 +170,7 @@ shinyServer(function(input, output, session){
                         legend.justification = c(0,1),
                         legend.position = c(.1, 1),
                         legend.background = element_blank(),
-                        legend.direction = "horizontal",
+                        legend.direction = "vertical",
                         # text = element_text(family = "TT Arial"),
                         plot.title = element_text(size = 20, margin = margin(b = 10))
                   )
@@ -199,7 +208,7 @@ shinyServer(function(input, output, session){
                         legend.justification = c(0,1),
                         legend.position = c(.1, 1),
                         legend.background = element_blank(),
-                        legend.direction = "horizontal",
+                        legend.direction = "vertical",
                         # text = element_text(family = "TT Arial"),
                         plot.title = element_text(size = 20, margin = margin(b = 10))
                   )
@@ -243,57 +252,743 @@ shinyServer(function(input, output, session){
       
       # Profile Pg ===============
       
+      # Tables
       # Batting
       output$prof_bat_Table <- renderDT({
+            prof_bat_tab <- prof_batting %>% 
+                  filter(Name == input$prof_bat_player)
             datatable(
-                  data = prof_batting,
+                  data = prof_bat_tab,
                   rownames = FALSE,
-                  extensions = c("FixedColumns","Buttons"),
-                  options = list(language = list(sSearch = "Filter:"),
-                                 buttons = c("colvis", "csv"),
+                  caption = htmltools::tags$caption(
+                        style = 'caption-side: top; text-align: left; color:#C6011F;
+                        font-size:100% ;', tags$b("Batting")),
+                  extensions = c("FixedColumns"),
+                  options = list(dom = 't',
                                  scrollX = TRUE,
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip")
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+                                 
             )
       })
       
       output$prof_field_Table <- renderDT({
+            prof_field_tab <- prof_fielding %>% 
+                  filter(Name == input$prof_bat_player)
             datatable(
-                  data = prof_fielding,
+                  data = prof_field_tab,
                   rownames = FALSE,
-                  extensions = c("FixedColumns","Buttons"),
-                  options = list(language = list(sSearch = "Filter:"),
-                                 buttons = c("colvis", "csv"),
+                  caption = htmltools::tags$caption(
+                        style = 'caption-side: top; text-align: left; color:#C6011F;
+                        font-size:100% ;', tags$b("Fielding")),
+                  extensions = c("FixedColumns"),
+                  options = list(dom = 't',
                                  scrollX = TRUE,
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip")
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+                  
             )
       })
       
       output$prof_psb_Table <- renderDT({
+            prof_psb_tab <- prof_postseas_b %>% 
+                  filter(Name == input$prof_bat_player)
             datatable(
-                  data = prof_postseas_b,
+                  data = prof_psb_tab,
                   rownames = FALSE,
-                  extensions = c("FixedColumns","Buttons"),
-                  options = list(language = list(sSearch = "Filter:"),
-                                 buttons = c("colvis", "csv"),
+                  caption = htmltools::tags$caption(
+                        style = 'caption-side: top; text-align: left; color:#C6011F;
+                        font-size:100% ;', tags$b("Postseason")),
+                  extensions = c("FixedColumns"),
+                  options = list(dom = 't',
                                  scrollX = TRUE,
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip")
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
             )
       })
       
-      output$prof_awa_Table <- renderDT({
+      output$prof_awab_Table <- renderDT({
+            prof_awab_tab <- prof_awards_b %>% 
+                  filter(Name == input$prof_bat_player)
             datatable(
-                  data = prof_awards_b,
+                  data = prof_awab_tab,
                   rownames = FALSE,
-                  extensions = c("FixedColumns","Buttons"),
-                  options = list(language = list(sSearch = "Filter:"),
-                                 buttons = c("colvis", "csv"),
+                  caption = htmltools::tags$caption(
+                        style = 'caption-side: top; text-align: left; color:#C6011F;
+                        font-size:100% ;', tags$b("Awards")),
+                  extensions = c("FixedColumns"),
+                  options = list(dom = 't',
                                  scrollX = TRUE,
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip")
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
             )
+      })
+      
+      # Pitching
+      output$prof_pit_Table <- renderDT({
+            prof_pit_tab <- prof_pitching %>% 
+                  filter(Name == input$prof_pit_player)
+            datatable(
+                      data = prof_pit_tab,
+                      rownames = FALSE,
+                      caption = htmltools::tags$caption(
+                            style = 'caption-side: top; text-align: left; color:#C6011F;
+                            font-size:100% ;', tags$b("Pitching")),
+                      extensions = c("FixedColumns"),
+                      options = list(dom = 't',
+                                     scrollX = TRUE,
+                                     fixedColumns = list(leftColumns = 1),
+                                     initComplete = JS(
+                                           "function(settings, json) {",
+                                           "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                           "}"
+                                     ))
+            )
+      })
+      
+      output$prof_psp_Table <- renderDT({
+            prof_psp_tab <- prof_postseas_p %>% 
+                  filter(Name == input$prof_pit_player)
+            datatable(
+                  data = prof_psp_tab,
+                  rownames = FALSE,
+                  caption = htmltools::tags$caption(
+                        style = 'caption-side: top; text-align: left; color:#C6011F;
+                        font-size:100% ;', tags$b("Postseason")),
+                  extensions = c("FixedColumns"),
+                  options = list(dom = 't',
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+            )
+      })
+      
+      output$prof_awap_Table <- renderDT({
+            prof_awap_tab <- prof_awards_b %>% 
+                  filter(Name == input$prof_pit_player)
+            datatable(
+                  data = prof_awap_tab,
+                  rownames = FALSE,
+                  caption = htmltools::tags$caption(
+                        style = 'caption-side: top; text-align: left; color:#C6011F;
+                        font-size:100% ;', tags$b("Awards")),
+                  extensions = c("FixedColumns"),
+                  options = list(dom = 't',
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+            )
+      })
+      
+      # Deviation Charts
+      
+      # Batting
+      output$bat_dev <- renderPlot({
+            
+            phb_tab <- phb %>% 
+                  filter(Name == input$prof_bat_player)
+            dev_b <- ggdotchart(phb_tab, x = "stat", y = "score",
+                            color = "sign",                                
+                            palette = c("#000000", "#C6011F", "#FC4E07"), 
+                            sorting = "descending",                       
+                            add = "segments",                             
+                            add.params = list(color = "lightgray", size = 2), 
+                            group = "sign",
+                            label = round(phb_tab$score, 1),
+                            xlab = FALSE,
+                            dot.size = 7, 
+                            font.label = list(color = "white", size = 9, 
+                                              vjust = 0.5),               
+                            ggtheme = theme_pubr(),                       
+                            rotate = TRUE
+            )+
+                  geom_vline(xintercept = 0, linetype = 2, color = "lightgray") + rremove("x.axis") + rremove("legend")
+            
+            ggpar(dev_b, title = "HOF Score", caption = "Score relates player to typical HOFer", ticks = FALSE)
+      })
+      
+      # Pitching
+      output$pit_dev <- renderPlot({
+            
+            php_tab <- php %>% 
+                  filter(Name == input$prof_pit_player)
+            dev_p <- ggdotchart(php_tab, x = "stat", y = "score",
+                                color = "sign",                                
+                                palette = c("#000000", "#C6011F", "#FC4E07"), 
+                                sorting = "descending",                       
+                                add = "segments",                             
+                                add.params = list(color = "lightgray", size = 2), 
+                                group = "sign",
+                                label = round(php_tab$score, 1),
+                                xlab = FALSE,
+                                dot.size = 7, 
+                                font.label = list(color = "white", size = 9, 
+                                                  vjust = 0.5),               
+                                ggtheme = theme_pubr(),                       
+                                rotate = TRUE
+            )+
+                  geom_vline(xintercept = 0, linetype = 2, color = "lightgray") + rremove("x.axis") + rremove("legend")
+            
+            ggpar(dev_p, title = "HOF Score", caption = "Score relates player to typical HOFer", ticks = FALSE)
+      })
+      
+      
+      
+      # Stat Rank Pg ===============
+      
+      # Tables
+      # Batting
+      output$sr_hof_bTable <- renderDT({
+            datatable(
+                  data = prof_batting,
+                  rownames = FALSE,
+                  caption = htmltools::tags$caption(
+                        style = 'caption-side: top; text-align: left; color:#C6011F;
+                        font-size:100% ;', tags$b("HOF")),
+                  extensions = c("FixedColumns","Buttons"),
+                  options = list(language = list(sSearch = "Filter:"),
+                                 buttons = c("colvis", "csv", "pdf"),
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+            )
+      })
+      
+      output$sr_fran_bTable <- renderDT({
+            datatable(
+                  data = sr_fran_bat,
+                  rownames = FALSE,
+                  caption = htmltools::tags$caption(
+                        style = 'caption-side: top; text-align: left; color:#C6011F;
+                        font-size:100% ;', tags$b("Franchise")),
+                  extensions = c("FixedColumns","Buttons"),
+                  options = list(language = list(sSearch = "Filter:"),
+                                 buttons = c("colvis", "csv", "pdf"),
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+                  )
+      })
+      
+      # Pitching
+      output$sr_hof_pTable <- renderDT({
+            datatable(
+                  data = prof_pitching,
+                  rownames = FALSE,
+                  caption = htmltools::tags$caption(
+                        style = 'caption-side: top; text-align: left; color:#C6011F;
+                        font-size:100% ;', tags$b("HOF")),
+                  extensions = c("FixedColumns","Buttons"),
+                  options = list(language = list(sSearch = "Filter:"),
+                                 buttons = c("colvis", "csv", "pdf"),
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+                  )
+      })
+      
+      output$sr_fran_pTable <- renderDT({
+            datatable(
+                  data = sr_fran_pit,
+                  rownames = FALSE,
+                  caption = htmltools::tags$caption(
+                        style = 'caption-side: top; text-align: left; color:#C6011F;
+                        font-size:100% ;', tags$b("Franchise")),
+                  extensions = c("FixedColumns","Buttons"),
+                  options = list(language = list(sSearch = "Filter:"),
+                                 buttons = c("colvis", "csv", "pdf"),
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+                  )
+      })
+      
+      
+      # Density
+      # Batting
+      # HOF
+      output$hof_bat_dens <- renderPlot({
+            ggplot2::theme_set(
+                  theme_bw(base_size = 12) +
+                        theme(
+                              plot.title = element_text(face = 'bold', hjust = 0),
+                              text = element_text(colour = '#4e5c65'),
+                              panel.background = element_rect('#ffffff'),
+                              strip.background = element_rect('#ffffff', colour = 'white'),
+                              plot.background = element_rect('#ffffff'),
+                              panel.border = element_rect(colour = '#ffffff'),
+                              panel.grid.major.x = element_blank(),
+                              panel.grid.major.y = element_blank(),
+                              panel.grid.minor.y = element_blank(),
+                              legend.background = element_rect('#ffffff'),
+                              legend.title = element_blank(),
+                              legend.position = 'right',
+                              legend.direction = 'vertical',
+                              legend.key = element_blank(),
+                              strip.text = element_text(face = 'bold', size = 10),
+                              axis.text = element_text(face = 'bold', size = 9),
+                              axis.title = element_blank(),
+                              axis.ticks = element_blank()
+                        )
+            )
+            
+            hofb_density_FUN <- function(play_sel, col_sel) {
+                  
+                  # Density calculation
+                  df2 <-  prof_batting %>%
+                        select(Name) %>% 
+                        group_by(Name) %>%
+                        do(tidy(density(prof_batting[, col_sel][[1]], bw = "nrd0", na.rm = TRUE))) %>% 
+                        group_by() %>% 
+                        mutate(ymin = max(y) / 1.5, 
+                               ymax = y + ymin,
+                               ylabel = ymin + min(ymin)/2,
+                               xlabel = min(x) - mean(range(x))/2)
+                  
+                  # Median label coords using vars from density calc
+                  labels2 <- prof_batting %>% 
+                        select(Name, !!col_sel) %>% 
+                        mutate(median = median(!!sym(col_sel), na.rm = TRUE)) %>%
+                        filter(row_number() == 1) %>% 
+                        select(-one_of(col_sel)) %>% 
+                        left_join(df2) %>% 
+                        mutate(xmed = x[which.min(abs(x - median))],
+                               yminmed = ymin[which.min(abs(x - median))],
+                               ymaxmed = ymax[which.min(abs(x - median))]) %>% 
+                        filter(row_number() == 1)     
+                  
+                  # Player stat for shaded area
+                  shade_bdy <- prof_batting %>% 
+                        filter(Name == play_sel)
+                  shade_bdy <- shade_bdy[, col_sel][[1]]
+                  
+                  
+                  if(col_sel %in% c("wRC+", "BB%", "K%", "OPS+", "2B", "3B")) {
+                        col_sel <- paste0("`", col_sel, "`")
+                  } else {
+                        col_sel
+                  }
+                  
+                  # frame
+                  a <- ggplot(data = prof_batting, aes_string(x = quo_name(col_sel))) +
+                        geom_density(fill = "#000000", alpha = 0.7) +
+                        scale_x_continuous() +
+                        theme(axis.text.y = element_blank())
+                  
+                  d <- ggplot_build(a)$data[[1]]
+                  
+                  # Shaded area, median line, median label
+                  a + geom_area(data = subset(d, x < shade_bdy), aes(x = x, y = y), fill = "#C6011F", alpha = 0.75) +
+                        
+                        geom_segment(data = labels2, aes(x = xmed, xend = xmed, y = 0, yend = ymaxmed/1.77), colour = "#F0F0F0", linetype = "dashed") +
+                        
+                        geom_text(data = labels2, aes(xmed - xlabel/50, (ylabel*0.05 + ylabel)), 
+                                  label = "Median", colour = "#000000", hjust = 0, fontface = "italic", size = 4) +
+                        geom_rug() +
+                        labs(title = "HOF")
+                  
+            }
+            
+            hofb_density_FUN(input$r_bat_player, input$r_bat_stat)
+      })
+      
+      # Franchise
+      output$fran_bat_dens <- renderPlot({
+            ggplot2::theme_set(
+                  theme_bw(base_size = 12) +
+                        theme(
+                              plot.title = element_text(face = 'bold', hjust = 0),
+                              text = element_text(colour = '#4e5c65'),
+                              panel.background = element_rect('#ffffff'),
+                              strip.background = element_rect('#ffffff', colour = 'white'),
+                              plot.background = element_rect('#ffffff'),
+                              panel.border = element_rect(colour = '#ffffff'),
+                              panel.grid.major.x = element_blank(),
+                              panel.grid.major.y = element_blank(),
+                              panel.grid.minor.y = element_blank(),
+                              legend.background = element_rect('#ffffff'),
+                              legend.title = element_blank(),
+                              legend.position = 'right',
+                              legend.direction = 'vertical',
+                              legend.key = element_blank(),
+                              strip.text = element_text(face = 'bold', size = 10),
+                              axis.text = element_text(face = 'bold', size = 9),
+                              axis.title = element_blank(),
+                              axis.ticks = element_blank()
+                        )
+            )
+            
+            franb_density_FUN <- function(play_sel, col_sel) {
+                  
+                  # Density calculation
+                  df2 <-  sr_fran_bat %>%
+                        select(Name) %>% 
+                        group_by(Name) %>%
+                        do(tidy(density(sr_fran_bat[, col_sel][[1]], bw = "nrd0", na.rm = TRUE))) %>% 
+                        group_by() %>% 
+                        mutate(ymin = max(y) / 1.5, 
+                               ymax = y + ymin,
+                               ylabel = ymin + min(ymin)/2,
+                               xlabel = min(x) - mean(range(x))/2)
+                  
+                  # Median label coords using vars from density calc
+                  labels2 <- sr_fran_bat %>% 
+                        select(Name, !!col_sel) %>% 
+                        mutate(median = median(!!sym(col_sel), na.rm = TRUE)) %>%
+                        filter(row_number() == 1) %>% 
+                        select(-one_of(col_sel)) %>% 
+                        left_join(df2) %>% 
+                        mutate(xmed = x[which.min(abs(x - median))],
+                               yminmed = ymin[which.min(abs(x - median))],
+                               ymaxmed = ymax[which.min(abs(x - median))]) %>% 
+                        filter(row_number() == 1)     
+                  
+                  # Player stat for shaded area
+                  shade_bdy <- sr_fran_bat %>% 
+                        filter(Name == play_sel)
+                  shade_bdy <- shade_bdy[, col_sel][[1]]
+                  
+                  
+                  if(col_sel %in% c("wRC+", "BB%", "K%", "OPS+", "2B", "3B")) {
+                        col_sel <- paste0("`", col_sel, "`")
+                  } else {
+                        col_sel
+                  }
+                  
+                  # frame
+                  a <- ggplot(data = sr_fran_bat, aes_string(x = quo_name(col_sel))) +
+                        geom_density(fill = "#000000", alpha = 0.7) +
+                        scale_x_continuous() +
+                        theme(axis.text.y = element_blank())
+                  
+                  d <- ggplot_build(a)$data[[1]]
+                  
+                  # Shaded area, median line, median label
+                  a + geom_area(data = subset(d, x < shade_bdy), aes(x = x, y = y), fill = "#C6011F", alpha = 0.75) +
+                        
+                        geom_segment(data = labels2, aes(x = xmed, xend = xmed, y = 0, yend = ymaxmed/1.77), colour = "#F0F0F0", linetype = "dashed") +
+                        
+                        geom_text(data = labels2, aes(xmed - xlabel/50, (ylabel*0.05 + ylabel)), 
+                                  label = "Median", colour = "#000000", hjust = 0, fontface = "italic", size = 4) +
+                        geom_rug() +
+                        labs(title = "Franchise")
+                  
+            }
+            
+            franb_density_FUN(input$r_bat_player, input$r_bat_stat)
+      })
+      
+      
+      # Pitching
+      # HOF
+      
+      output$hof_pit_dens <- renderPlot({
+            ggplot2::theme_set(
+                  theme_bw(base_size = 12) +
+                        theme(
+                              plot.title = element_text(face = 'bold', hjust = 0),
+                              text = element_text(colour = '#4e5c65'),
+                              panel.background = element_rect('#ffffff'),
+                              strip.background = element_rect('#ffffff', colour = 'white'),
+                              plot.background = element_rect('#ffffff'),
+                              panel.border = element_rect(colour = '#ffffff'),
+                              panel.grid.major.x = element_blank(),
+                              panel.grid.major.y = element_blank(),
+                              panel.grid.minor.y = element_blank(),
+                              legend.background = element_rect('#ffffff'),
+                              legend.title = element_blank(),
+                              legend.position = 'right',
+                              legend.direction = 'vertical',
+                              legend.key = element_blank(),
+                              strip.text = element_text(face = 'bold', size = 10),
+                              axis.text = element_text(face = 'bold', size = 9),
+                              axis.title = element_blank(),
+                              axis.ticks = element_blank()
+                        )
+            )
+            
+            hofp_density_FUN <- function(play_sel, col_sel) {
+                  
+                  # Density calculation
+                  df2 <-  prof_pitching %>%
+                        select(Name) %>% 
+                        group_by(Name) %>%
+                        do(tidy(density(prof_pitching[, col_sel][[1]], bw = "nrd0", na.rm = TRUE))) %>% 
+                        group_by() %>% 
+                        mutate(ymin = max(y) / 1.5, 
+                               ymax = y + ymin,
+                               ylabel = ymin + min(ymin)/2,
+                               xlabel = min(x) - mean(range(x))/2)
+                  
+                  # Median label coords using vars from density calc
+                  labels2 <- prof_pitching %>% 
+                        select(Name, !!col_sel) %>% 
+                        mutate(median = median(!!sym(col_sel), na.rm = TRUE)) %>%
+                        filter(row_number() == 1) %>% 
+                        select(-one_of(col_sel)) %>% 
+                        left_join(df2) %>% 
+                        mutate(xmed = x[which.min(abs(x - median))],
+                               yminmed = ymin[which.min(abs(x - median))],
+                               ymaxmed = ymax[which.min(abs(x - median))]) %>% 
+                        filter(row_number() == 1)     
+                  
+                  # Player stat for shaded area
+                  shade_bdy <- prof_pitching %>% 
+                        filter(Name == play_sel)
+                  shade_bdy <- shade_bdy[, col_sel][[1]]
+                  
+                  
+                  if(col_sel %in% c("W-L%", "ERA-", "FIP-", "xFIP-", "K/9", "BB/9", "K/BB", "HR/9", "K%", "BB%", "K-BB%", "ERA+")) {
+                        col_sel <- paste0("`", col_sel, "`")
+                  } else {
+                        col_sel
+                  }
+                  
+                  # frame
+                  a <- ggplot(data = prof_pitching, aes_string(x = quo_name(col_sel))) +
+                        geom_density(fill = "#000000", alpha = 0.7) +
+                        scale_x_continuous() +
+                        theme(axis.text.y = element_blank())
+                  
+                  d <- ggplot_build(a)$data[[1]]
+                  
+                  # Shaded area, median line, median label
+                  a + geom_area(data = subset(d, x < shade_bdy), aes(x = x, y = y), fill = "#C6011F", alpha = 0.75) +
+                        
+                        geom_segment(data = labels2, aes(x = xmed, xend = xmed, y = 0, yend = ymaxmed/1.77), colour = "#F0F0F0", linetype = "dashed") +
+                        
+                        geom_text(data = labels2, aes(xmed - xlabel/50, (ylabel*0.05 + ylabel)), 
+                                  label = "Median", colour = "#000000", hjust = 0, fontface = "italic", size = 4) +
+                        geom_rug() +
+                        labs(title = "HOF")
+                  
+            }
+            
+            hofp_density_FUN(input$r_pit_player, input$r_pit_stat)
+      })
+      
+      # Franchise
+      
+      output$fran_pit_dens <- renderPlot({
+            ggplot2::theme_set(
+                  theme_bw(base_size = 12) +
+                        theme(
+                              plot.title = element_text(face = 'bold', hjust = 0),
+                              text = element_text(colour = '#4e5c65'),
+                              panel.background = element_rect('#ffffff'),
+                              strip.background = element_rect('#ffffff', colour = 'white'),
+                              plot.background = element_rect('#ffffff'),
+                              panel.border = element_rect(colour = '#ffffff'),
+                              panel.grid.major.x = element_blank(),
+                              panel.grid.major.y = element_blank(),
+                              panel.grid.minor.y = element_blank(),
+                              legend.background = element_rect('#ffffff'),
+                              legend.title = element_blank(),
+                              legend.position = 'right',
+                              legend.direction = 'vertical',
+                              legend.key = element_blank(),
+                              strip.text = element_text(face = 'bold', size = 10),
+                              axis.text = element_text(face = 'bold', size = 9),
+                              axis.title = element_blank(),
+                              axis.ticks = element_blank()
+                        )
+            )
+            
+            franp_density_FUN <- function(play_sel, col_sel) {
+                  
+                  # Density calculation
+                  df2 <-  sr_fran_pit %>%
+                        select(Name) %>% 
+                        group_by(Name) %>%
+                        do(tidy(density(sr_fran_pit[, col_sel][[1]], bw = "nrd0", na.rm = TRUE))) %>% 
+                        group_by() %>% 
+                        mutate(ymin = max(y) / 1.5, 
+                               ymax = y + ymin,
+                               ylabel = ymin + min(ymin)/2,
+                               xlabel = min(x) - mean(range(x))/2)
+                  
+                  # Median label coords using vars from density calc
+                  labels2 <- sr_fran_pit %>% 
+                        select(Name, !!col_sel) %>% 
+                        mutate(median = median(!!sym(col_sel), na.rm = TRUE)) %>%
+                        filter(row_number() == 1) %>% 
+                        select(-one_of(col_sel)) %>% 
+                        left_join(df2) %>% 
+                        mutate(xmed = x[which.min(abs(x - median))],
+                               yminmed = ymin[which.min(abs(x - median))],
+                               ymaxmed = ymax[which.min(abs(x - median))]) %>% 
+                        filter(row_number() == 1)     
+                  
+                  # Player stat for shaded area
+                  shade_bdy <- sr_fran_pit %>% 
+                        filter(Name == play_sel)
+                  shade_bdy <- shade_bdy[, col_sel][[1]]
+                  
+                  
+                  if(col_sel %in% c("W-L%", "ERA-", "FIP-", "xFIP-", "K/9", "BB/9", "K/BB", "HR/9", "K%", "BB%", "K-BB%", "ERA+")) {
+                        col_sel <- paste0("`", col_sel, "`")
+                  } else {
+                        col_sel
+                  }
+                  
+                  # frame
+                  a <- ggplot(data = sr_fran_pit, aes_string(x = quo_name(col_sel))) +
+                        geom_density(fill = "#000000", alpha = 0.7) +
+                        scale_x_continuous() +
+                        theme(axis.text.y = element_blank())
+                  
+                  d <- ggplot_build(a)$data[[1]]
+                  
+                  # Shaded area, median line, median label
+                  a + geom_area(data = subset(d, x < shade_bdy), aes(x = x, y = y), fill = "#C6011F", alpha = 0.75) +
+                        
+                        geom_segment(data = labels2, aes(x = xmed, xend = xmed, y = 0, yend = ymaxmed/1.77), colour = "#F0F0F0", linetype = "dashed") +
+                        
+                        geom_text(data = labels2, aes(xmed - xlabel/50, (ylabel*0.05 + ylabel)), 
+                                  label = "Median", colour = "#000000", hjust = 0, fontface = "italic", size = 4) +
+                        geom_rug() +
+                        labs(title = "Franchise")
+                  
+            }
+            
+            franp_density_FUN(input$r_pit_player, input$r_pit_stat)
+      })
+      
+      # 'value' boxes
+      # Batting
+      
+      output$hof_bvalue_box <- renderUI({
+            
+            text_FUN <- function(name, stat) {
+                  rank_var <- paste0("rank_", stat)
+                  perc_var <- paste0("perc_", stat)
+                  median_var <- paste0("median_", stat)
+                  
+                  hbv <- sr_hof_brank %>% 
+                        filter(Name == name) %>% 
+                        select(!!stat, !!median_var, !!rank_var, !!perc_var)
+                  
+                  hbv_list <- as.list(hbv)
+            }
+            values <- text_FUN(input$r_bat_player, input$r_bat_stat)
+            HTML(paste("<b>Value:</b>  ", values[1],
+                  "<br><b>Median:</b>  ", values[2],
+                  "<br><b>Rank:</b>  ", values[3],
+                  "<br><b>Percentile:</b>  ", values[4],
+                  "<br><br><br>"))
+            
+      })
+      
+      output$fran_bvalue_box <- renderUI({
+            
+            text_FUN <- function(name, stat) {
+                  rank_var <- paste0("rank_", stat)
+                  perc_var <- paste0("perc_", stat)
+                  median_var <- paste0("median_", stat)
+                  
+                  hbv <- sr_fran_brank %>% 
+                        filter(Name == name) %>% 
+                        select(!!stat, !!median_var, !!rank_var, !!perc_var)
+                  
+                  hbv_list <- as.list(hbv)
+            }
+            values <- text_FUN(input$r_bat_player, input$r_bat_stat)
+            HTML(paste("<b>Value:</b>  ", values[1],
+                       "<br><b>Median:</b>  ", values[2],
+                       "<br><b>Rank:</b>  ", values[3],
+                       "<br><b>Percentile:</b>  ", values[4],
+                       "<br><br><br>"))
+            
+      })
+      
+      # Pitching
+      
+      output$hof_pvalue_box <- renderUI({
+            
+            text_FUN <- function(name, stat) {
+                  rank_var <- paste0("rank_", stat)
+                  perc_var <- paste0("perc_", stat)
+                  median_var <- paste0("median_", stat)
+                  
+                  hbv <- sr_hof_prank %>% 
+                        filter(Name == name) %>% 
+                        select(!!stat, !!median_var, !!rank_var, !!perc_var)
+                  
+                  hbv_list <- as.list(hbv)
+            }
+            values <- text_FUN(input$r_pit_player, input$r_pit_stat)
+            HTML(paste("<b>Value:</b>  ", values[1],
+                       "<br><b>Median:</b>  ", values[2],
+                       "<br><b>Rank:</b>  ", values[3],
+                       "<br><b>Percentile:</b>  ", values[4],
+                       "<br><br><br>"))
+            
+      })
+      
+      output$fran_pvalue_box <- renderUI({
+            
+            text_FUN <- function(name, stat) {
+                  rank_var <- paste0("rank_", stat)
+                  perc_var <- paste0("perc_", stat)
+                  median_var <- paste0("median_", stat)
+                  
+                  hbv <- sr_fran_prank %>% 
+                        filter(Name == name) %>% 
+                        select(!!stat, !!median_var, !!rank_var, !!perc_var)
+                  
+                  hbv_list <- as.list(hbv)
+            }
+            values <- text_FUN(input$r_pit_player, input$r_pit_stat)
+            HTML(paste("<b>Value:</b>  ", values[1],
+                       "<br><b>Median:</b>  ", values[2],
+                       "<br><b>Rank:</b>  ", values[3],
+                       "<br><b>Percentile:</b>  ", values[4],
+                       "<br><br><br>"))
+            
       })
 })
 

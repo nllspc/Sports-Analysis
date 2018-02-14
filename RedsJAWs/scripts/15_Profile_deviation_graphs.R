@@ -7,7 +7,7 @@
 
 library(tidyverse)
 library(ggpubr)
-library(plotly)
+
 
 
 rfb <- read_rds("data/14 - reg standardization fran batting.rds")
@@ -57,9 +57,9 @@ p <- ggdotchart(phb_griff, x = "stat", y = "score",
 )+
       geom_vline(xintercept = 0, linetype = 2, color = "lightgray") + rremove("x.axis") + rremove("legend")
 
-q <- ggpar(p, title = "HOF Score", caption = "Score relates player to typical HOFer", ticks = FALSE)
-q
-ggplotly(q)
+ggpar(p, title = "HOF Score", caption = "Score relates player to typical HOFer", ticks = FALSE)
+
+
 
 
 
