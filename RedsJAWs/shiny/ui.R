@@ -41,7 +41,15 @@ dashSidebar <- dashboardSidebar(
             menuItem(
                   text = "Numbers",
                   tabName = "numTab",
-                  icon = icon("calculator")
+                  icon = icon("calculator"),
+                  menuSubItem(
+                        text = "Batting",
+                        tabName = "numBatTab"
+                  ),
+                  menuSubItem(
+                        text = "Pitching",
+                        tabName = "numPitTab"
+                  )
             )
       )
 )
@@ -74,15 +82,6 @@ dashBody <- dashboardBody(
             
       ),
       
-      tags$style(HTML("
-                  .box.box-solid.box-primary>.box-header {
-                  }
-                  .box.box-solid.box-primary{
-                  color:#fff;
-                  background:#C6011F
-                  }
-                ")),
-      
       tabItems(
             tabItem(
                   tabName = 'homeTab',
@@ -102,7 +101,7 @@ dashBody <- dashboardBody(
                   tabName = 'jawsTab',
                   fluidRow(
                         box(
-                              width = 4,
+                              width = 6,
                               
                               
                               DTOutput(outputId = 'jTable')
@@ -110,12 +109,14 @@ dashBody <- dashboardBody(
                         ),
                         
                         box(
-                              width = 4,
+                              width = 6,
                               textInput(
                                     inputId = 'jplayer',
                                     label = 'Enter Player Name',
-                                    placeholder = 'Johnny Bench'
+                                    value = 'Johnny Bench'
                               ),
+                              
+                              ggiraphOutput(outputId = 'lineChart'),
                               
                               box(
                                     width = 6,
@@ -125,15 +126,9 @@ dashBody <- dashboardBody(
                                     width = 6,
                                     plotOutput(outputId = 'jawsCleve')
                               )
-                        ),
-                        
-                        box(
-                              width = 4,
                               
-                              ggiraphOutput(outputId = 'lineChart')
+                              
                         )
-                        
-                        
                   )
             ),
       
@@ -240,8 +235,6 @@ dashBody <- dashboardBody(
                                           width = 6,
                                           box(
                                                 width = 6,
-                                                status = "primary",
-                                                solidHeader = TRUE,
                                                 textInput(
                                                       inputId = 'r_pit_player',
                                                       label = 'Enter Player Name',
@@ -269,8 +262,64 @@ dashBody <- dashboardBody(
             ),
             
             tabItem(
-                  tabName = 'numTab',
-                  'Numbers'
+                  tabName = 'numBatTab',
+                  fluidRow(
+                        tabBox(
+                              width = 12,
+                              tabPanel(
+                                    title = 'Tenure',
+                                    DTOutput(outputId = 'numBatTenTab')
+                              ),
+                              tabPanel(
+                                    title = 'Season',
+                                    DTOutput(outputId = 'numBatSeasTab')
+                              ),
+                              tabPanel(
+                                    title = 'Fielding',
+                                    DTOutput(outputId = 'numBatFldTab')
+                              ),
+                              tabPanel(
+                                    title = 'Postseason',
+                                    DTOutput(outputId = 'numBatPsTab')
+                              ),
+                              tabPanel(
+                                    title = 'Awards',
+                                    DTOutput(outputId = 'numBatAwaTab')
+                              ),
+                              tabPanel(
+                                    title = 'Award Shares',
+                                    DTOutput(outputId = 'numBatAsTab')
+                              )
+                        )
+                  )
+            ),
+            tabItem(
+                  tabName = 'numPitTab',
+                  fluidRow(
+                        tabBox(
+                              width = 12,
+                              tabPanel(
+                                    title = 'Tenure',
+                                    DTOutput(outputId = 'numPitTenTab')
+                              ),
+                              tabPanel(
+                                    title = "Season",
+                                    DTOutput(outputId = 'numPitSeasTab')
+                              ),
+                              tabPanel(
+                                    title = "Postseason",
+                                    DTOutput(outputId = 'numPitPsTab')
+                              ),
+                              tabPanel(
+                                    title = "Awards",
+                                    DTOutput(outputId = 'numPitAwaTab')
+                              ),
+                              tabPanel(
+                                    title = "Award Shares",
+                                    DTOutput(outputId = 'numPitAsTab')
+                              )
+                        )
+                  )
             )
       )
 )

@@ -22,6 +22,9 @@ library(ggpubr)
 library(broom)
 library(rlang)
 
+# Numbers page
+library(formattable)
+
 # Data =========================================================
 
 # Home Page ====================
@@ -72,6 +75,22 @@ sr_hof_prank <- read_rds("data/13 - HOF Pitching Stats and Ranks.rds")
 
 sr_fran_brank <- read_rds("data/13 - Franchise Batting Stats and Ranks.rds")
 sr_fran_prank <- read_rds("data/13 - Franchise Pitching Stats and Ranks.rds")
+
+# Number Page ====================
+
+awards_b_num <- read_rds("data/21 - Numbers pg HOF Batting Awards.rds")
+batting_num <- read_rds("data/21 - Numbers pg HOF Batting.rds")
+awards_shares_b_num <- read_rds("data/21 - Numbers pg HOF Batting Awards Shares.rds")
+fielding_num <- read_rds("data/21 - Numbers pg HOF Fielding.rds")
+pitching_num <- read_rds("data/21 - Numbers pg HOF Pitching.rds")
+awards_shares_p_num <- read_rds("data/21 - Numbers pg HOF Pitching Awards Shares.rds")
+awards_p_num <- read_rds("data/21 - Numbers pg HOF Pitching Awards.rds")
+ps_bat_num <- read_rds("data/21 - Numbers pg HOF Postseason Batting.rds")
+ps_pit_num <- read_rds("data/21 - Numbers pg HOF Postseason Pitching.rds")
+seas_bat_num <- read_rds("data/21 - Numbers pg HOF Season Batting.rds")
+seas_pit_num <- read_rds("data/21 - Numbers pg HOF Season Pitching.rds")
+
+
 
 # Server =======================================================
 
@@ -990,6 +1009,217 @@ shinyServer(function(input, output, session){
                        "<br><br><br>"))
             
       })
+      
+      
+      
+      # Numbers Page =====================
+      
+      # Batting
+      
+      output$numBatTenTab <- renderDT({
+            as.datatable(
+                  x = batting_num,
+                  rownames = FALSE,
+                  extensions = c("FixedColumns","Buttons"),
+                  options = list(language = list(sSearch = "Filter:"),
+                                 buttons = c("colvis", "csv", "pdf"),
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+                  )
+      })
+      
+      output$numBatSeasTab <- renderDT({
+            as.datatable(
+                  x = seas_bat_num,
+                  rownames = FALSE,
+                  extensions = c("FixedColumns","Buttons"),
+                  options = list(language = list(sSearch = "Filter:"),
+                                 buttons = c("colvis", "csv", "pdf"),
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+            )
+      })
+      
+      output$numBatFldTab <- renderDT({
+            as.datatable(
+                  x = fielding_num,
+                  rownames = FALSE,
+                  extensions = c("FixedColumns","Buttons"),
+                  options = list(language = list(sSearch = "Filter:"),
+                                 buttons = c("colvis", "csv", "pdf"),
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+            )
+      })
+      
+      output$numBatPsTab <- renderDT({
+            as.datatable(
+                  x = ps_bat_num,
+                  rownames = FALSE,
+                  extensions = c("FixedColumns","Buttons"),
+                  options = list(language = list(sSearch = "Filter:"),
+                                 buttons = c("colvis", "csv", "pdf"),
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+            )
+      })
+      
+      
+      output$numBatAwaTab <- renderDT({
+            as.datatable(
+                  x = awards_b_num,
+                  rownames = FALSE,
+                  extensions = c("FixedColumns","Buttons"),
+                  options = list(language = list(sSearch = "Filter:"),
+                                 buttons = c("colvis", "csv", "pdf"),
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+            )
+      })
+      
+      output$numBatAsTab <- renderDT({
+            as.datatable(
+                  x = awards_shares_b_num,
+                  rownames = FALSE,
+                  extensions = c("FixedColumns","Buttons"),
+                  options = list(language = list(sSearch = "Filter:"),
+                                 buttons = c("colvis", "csv", "pdf"),
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+            )
+      })
+      
+      
+      # Pitching
+      
+      output$numPitTenTab <- renderDT({
+            as.datatable(
+                  x = pitching_num,
+                  rownames = FALSE,
+                  extensions = c("FixedColumns","Buttons"),
+                  options = list(language = list(sSearch = "Filter:"),
+                                 buttons = c("colvis", "csv", "pdf"),
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+            )
+      })
+      
+      output$numPitSeasTab <- renderDT({
+            as.datatable(
+                  x = seas_pit_num,
+                  rownames = FALSE,
+                  extensions = c("FixedColumns","Buttons"),
+                  options = list(language = list(sSearch = "Filter:"),
+                                 buttons = c("colvis", "csv", "pdf"),
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+            )
+      })
+      
+      output$numPitPsTab <- renderDT({
+            as.datatable(
+                  x = ps_pit_num,
+                  rownames = FALSE,
+                  extensions = c("FixedColumns","Buttons"),
+                  options = list(language = list(sSearch = "Filter:"),
+                                 buttons = c("colvis", "csv", "pdf"),
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+            )
+      })
+      
+      
+      output$numPitAwaTab <- renderDT({
+            as.datatable(
+                  x = awards_p_num,
+                  rownames = FALSE,
+                  extensions = c("FixedColumns","Buttons"),
+                  options = list(language = list(sSearch = "Filter:"),
+                                 buttons = c("colvis", "csv", "pdf"),
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+            )
+      })
+      
+      output$numPitAsTab <- renderDT({
+            as.datatable(
+                  x = awards_shares_p_num,
+                  rownames = FALSE,
+                  extensions = c("FixedColumns","Buttons"),
+                  options = list(language = list(sSearch = "Filter:"),
+                                 buttons = c("colvis", "csv", "pdf"),
+                                 scrollX = TRUE,
+                                 fixedColumns = list(leftColumns = 1),
+                                 dom = "Bfrtip",
+                                 initComplete = JS(
+                                       "function(settings, json) {",
+                                       "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
+                                       "}"
+                                 ))
+            )
+      })
+      
+      
 })
 
 

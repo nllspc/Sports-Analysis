@@ -6,7 +6,7 @@
 library(tidyverse)
 library(broom)
 library(rlang)
-
+library(scales)
 
 
 # Reds HOF inductee and nominee war and jaws (career) stats
@@ -107,26 +107,29 @@ franchise_batting <- franchise_batting %>%
       mutate('K%' = as.numeric(K_perc), 'BB%' = as.numeric(BB_perc)) %>% 
       select(-K_perc, -BB_perc)
 
-
+fb_withIds <- franchise_batting %>% 
+      select(bbref_playerId:BB, `BB%`, SO, `K%`, everything())
 
 franchise_batting <- franchise_batting %>% 
       select(bbref_playerId:BB, `BB%`, SO, `K%`, everything()) %>% 
       select(-bbref_playerId)
 
 write_rds(franchise_batting, "data/13 - Franchise Batting.rds")
-
+write_rds(fb_withIds, "data/13 - Franchise Batting wIds.rds")
 
 # Create HOF table =========================
 
 
-hof_batting <- map_dfr(inWandJb$playerId, function(x) {filter(franchise_batting, bbref_playerId == x)})
+hof_batting <- map_dfr(inWandJb$playerId, function(x) {filter(fb_withIds, bbref_playerId == x)}) %>% 
+      select(-bbref_playerId)
+hb_withIds <- map_dfr(inWandJb$playerId, function(x) {filter(fb_withIds, bbref_playerId == x)})
 
 # complete
 missing_hof <- setdiff(hof_batting$bbref_playerId, inWandJb$playerId)
 missing_wj <- setdiff(inWandJb$playerId, hof_batting$bbref_playerId)
 
 write_rds(hof_batting, "data/13 - HOF Batting.rds")
-
+write_rds(hb_withIds, "data/13 - HOF Batting wIds.rds")
 
 
 
@@ -136,34 +139,36 @@ write_rds(hof_batting, "data/13 - HOF Batting.rds")
 
 # Franchise
 
+
 fran_rank_perc_FUN <- function(x) {
       
       rank_var <- paste0("rank_", x)
       perc_var <- paste0("perc_", x)
       median_var <- paste0("median_", x)
       
-      if(x == "SO") {
-            franchise_batting %>%
-                  mutate(!!rank_var := min_rank(!! rlang::sym(x)), !!perc_var := round(percent_rank(desc(!! rlang::sym(x))) * 100, 0), !!median_var := median(!! rlang::sym(x), na.rm = TRUE)) %>% 
+      if(x %in% c("SO", "K%")) {
+            fb_withIds %>%
+                  mutate(!!rank_var := min_rank(!! rlang::sym(x)), !!perc_var := round(percent_rank(desc(!! rlang::sym(x))) * 100 + 1, 0), !!median_var := median(!! rlang::sym(x), na.rm = TRUE)) %>% 
                   select(rank_var, perc_var, median_var)
       } else {
-            franchise_batting %>%
+            fb_withIds %>%
                   mutate(!!rank_var := min_rank(desc(!! rlang::sym(x))), !!perc_var := round(percent_rank(!! rlang::sym(x)) * 100, 0), !!median_var := median(!! rlang::sym(x), na.rm = TRUE)) %>% 
                   select(rank_var, perc_var, median_var)
       }
 }
 
-fran_id_cols <- franchise_batting %>% 
+fran_id_cols <- fb_withIds %>% 
       select(bbref_playerId, Name)
-
-fran_col_names <- names(franchise_batting)
+fran_col_names <- names(fb_withIds)
 fran_col_names <- fran_col_names[-c(1,2)]
+
 fran_rank_perc <- map_dfc(fran_col_names, fran_rank_perc_FUN) %>% 
       bind_cols(fran_id_cols) %>% 
       select(bbref_playerId, Name, everything())
+
 write_rds(fran_rank_perc, "data/13 - franchise batting ranks.rds")
 
-fran_stats_rank <- franchise_batting %>% 
+fran_stats_rank <- fb_withIds %>% 
       inner_join(fran_rank_perc[-2], by = "bbref_playerId")
 write_rds(fran_stats_rank, "data/13 - Franchise Batting Stats and Ranks.rds")
 
@@ -327,3 +332,6 @@ write_rds(hofp_rank_perc, "data/13 - hof pitching ranks.rds")
 hofp_stats_rank <- hp_withIds %>% 
       inner_join(hofp_rank_perc[-2], by = "bbref_id")
 write_rds(hofp_stats_rank, "data/13 - HOF Pitching Stats and Ranks.rds")
+
+
+
