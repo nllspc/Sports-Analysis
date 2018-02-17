@@ -82,6 +82,11 @@ dashBody <- dashboardBody(
             
       ),
       
+      tags$style(type="text/css",
+                 ".shiny-output-error { visibility: hidden; }",
+                 ".shiny-output-error:before { visibility: hidden; }"
+      ),
+      
       tabItems(
             tabItem(
                   tabName = 'homeTab',
@@ -103,30 +108,32 @@ dashBody <- dashboardBody(
                         box(
                               width = 6,
                               
-                              
+                              textInput(
+                                    inputId = 'jplayer',
+                                    label = 'Enter Player Name',
+                                    value = 'Johnny Bench'
+                              ),
                               DTOutput(outputId = 'jTable')
                               
                         ),
                         
                         box(
                               width = 6,
-                              textInput(
-                                    inputId = 'jplayer',
-                                    label = 'Enter Player Name',
-                                    value = 'Johnny Bench'
+                              
+                              box(
+                                    width = 6,
+                                    plotOutput(outputId = 'jawsCleve')
                               ),
-                              
-                              ggiraphOutput(outputId = 'lineChart'),
-                              
                               box(
                                     width = 6,
                                     plotOutput(outputId = 'warCleve')
                               ),
-                              box(
-                                    width = 6,
-                                    plotOutput(outputId = 'jawsCleve')
-                              )
                               
+                              box(
+                                    width = 12,
+                                    height = 380,
+                                    ggiraphOutput(outputId = 'lineChart')
+                              )
                               
                         )
                   )
@@ -190,8 +197,8 @@ dashBody <- dashboardBody(
                                     box(
                                           width = 6,
                                           
-                                          DTOutput(outputId = 'sr_hof_bTable'),
-                                          DTOutput(outputId = 'sr_fran_bTable')
+                                          DTOutput(outputId = 'sr_hof_bTable')
+                                          
                                           
                                     ),
                                     box(
@@ -218,7 +225,8 @@ dashBody <- dashboardBody(
                                                 plotOutput(outputId = 'fran_bat_dens')
                                                 
                                           )
-                                    )
+                                    ),
+                                    DTOutput(outputId = 'sr_fran_bTable')
                               ),
                               
                               tabPanel(
@@ -226,8 +234,7 @@ dashBody <- dashboardBody(
                                     box(
                                           width = 6,
                                           
-                                          DTOutput(outputId = 'sr_hof_pTable'),
-                                          DTOutput(outputId = 'sr_fran_pTable')
+                                          DTOutput(outputId = 'sr_hof_pTable')
                                           
                                     ),
                                     
@@ -253,7 +260,8 @@ dashBody <- dashboardBody(
                                                 htmlOutput("fran_pvalue_box"),
                                                 plotOutput(outputId = 'fran_pit_dens')
                                           )
-                                    )
+                                    ),
+                                    DTOutput(outputId = 'sr_fran_pTable')
                               )
                               
                         )

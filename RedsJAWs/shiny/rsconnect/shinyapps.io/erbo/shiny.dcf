@@ -5,6 +5,6 @@ account: erbo
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 282645
-bundleId: 1225450
+bundleId: 1227117
 url: https://erbo.shinyapps.io/shiny/
-when: 1518743176.20323
+when: 1518831070.7502

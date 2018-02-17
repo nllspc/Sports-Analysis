@@ -130,6 +130,7 @@ write_rds(num_hof_pitching, "data/20 - Numbers pg HOF Pitching.rds")
 
 # Traditional
 
+# round_any allows me to truncate at the tenths decimal place
 sTradBat <- read_rds("data/10 - seasTraditionalBatStats.rds") %>% 
       rename(`BBRef Id` = bbref_id)
 sTradPit <- read_rds("data/10 - seasTraditionalPitStats.rds") %>% 
@@ -163,9 +164,15 @@ seasPit <- sTradPit %>%
       select(`BBRef Id`, `FG Id`, Name, everything()) %>% 
       inner_join(sAdvPit, by = c("BBRef Id", "Year"))
 
+seasBat_noId <- seasBat %>% 
+      select(-`BBRef Id`, -`FG Id`)
+seasPit_noId <- seasPit %>% 
+      select(-`BBRef Id`, -`FG Id`)
 
-write_rds(seasBat, "data/20 - Numbers pg HOF seas Batting.rds")
-write_rds(seasPit, "data/20 - Numbers pg HOF seas Pitching.rds")
+write_rds(seasBat_noId, "data/20 - Numbers pg HOF seas Batting.rds")
+write_rds(seasBat, "data/20 - Numbers pg wIds HOF seas Batting.rds")
+write_rds(seasPit_noId, "data/20 - Numbers pg HOF seas Pitching.rds")
+write_rds(seasPit, "data/20 - Numbers pg wIds HOF seas Pitching.rds")
 
 
 # Fielding, tenure =======================================
@@ -210,7 +217,11 @@ setdiff(num_hof_batting$`FG Id`, field_tenure$`FG Id`)
 setdiff(field_tenure$`FG Id`, num_hof_batting$`FG Id`)
 n_distinct(field_tenure$`FG Id`)
 
-write_rds(field_tenure, "data/20 - Numbers pg HOF Fielding.rds")
+field_ten_noIds <- field_tenure %>% 
+      select(-`BBRef Id`, -`FG Id`)
+
+write_rds(field_ten_noIds, "data/20 - Numbers pg HOF Fielding.rds")
+write_rds(field_tenure, "data/20 - Numbers pg wIds HOF Fielding.rds")
 
 
 
@@ -234,9 +245,15 @@ ps_pit <- read_rds("data/11 - careerRedsPostseasonPit.rds") %>%
       rename(`BBRef Id` = playerId) %>% 
       select(`BBRef Id`, `FG Id`, Name, W:CG, IP, SHO:H, R, everything())
 
+ps_bat_noId <- ps_bat %>% 
+      select(-`BBRef Id`, -`FG Id`)
+ps_pit_noId <- ps_pit %>% 
+      select(-`BBRef Id`, -`FG Id`)
 
-write_rds(ps_bat, "data/20 - Numbers pg HOF Postseason Batting.rds")
-write_rds(ps_pit, "data/20 - Numbers pg HOF Postseason Pitching.rds")
+write_rds(ps_bat_noId, "data/20 - Numbers pg HOF Postseason Batting.rds")
+write_rds(ps_bat, "data/20 - Numbers pg wIds HOF Postseason Batting.rds")
+write_rds(ps_pit_noId, "data/20 - Numbers pg HOF Postseason Pitching.rds")
+write_rds(ps_pit, "data/20 - Numbers pg wIds HOF Postseason Pitching.rds")
 
 
 

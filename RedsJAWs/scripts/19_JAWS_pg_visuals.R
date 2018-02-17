@@ -25,7 +25,7 @@ boone_jaws <- jaws_group %>%
 
 
 # Bench
-# 2 group plot
+# 2 group plot, no x-axis
 
 jaws_right_label <- bench_jaws %>% 
       group_by(Group) %>%
@@ -42,11 +42,12 @@ ggplot(bench_jaws, aes(x = Value, y = Group)) +
       geom_point(aes(color = Stat), size = 3) +
       geom_text(data = jaws_right_label, aes(color = Stat, label = round(Value, 1)), size = 5, hjust = -0.5) +
       geom_text(data = jaws_left_label, aes(color = Stat, label = round(Value, 1)), size = 5, hjust = 1.5) +
-      scale_x_continuous(limits = c(min(bench_jaws$Value)-10, max(bench_jaws$Value)+10)) + 
       scale_color_manual(labels = c("Typical HOFer (weighted)", "Player"), values = c("#000000", "#C6011F")) +
       labs(title = "JAWS-4") +
       theme_minimal() +
       theme(axis.title = element_blank(),
+            axis.ticks.x = element_blank(),
+            axis.text.x = element_blank(),
             panel.grid.major.x = element_blank(),
             panel.grid.minor = element_blank(),
             legend.title = element_blank(),

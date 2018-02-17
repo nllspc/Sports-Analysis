@@ -35,7 +35,8 @@ bothDistrb <- read_rds("data/08 - unweightedandGroupJoyplot.rds")
 # JAWS Page ====================
 
 # Table
-wj_display <- read_rds("data/18 - JAWS pg display table.rds")
+wj_display <- read_rds("data/18 - JAWS pg display table.rds") %>% 
+      rename(WARtenure = WAR)
 
 # Cleveland Dot Plots
 jaws_group <- read_rds("data/18 - JAWS pg JAWS dot chart table.rds")
@@ -81,14 +82,15 @@ sr_fran_prank <- read_rds("data/13 - Franchise Pitching Stats and Ranks.rds")
 awards_b_num <- read_rds("data/21 - Numbers pg HOF Batting Awards.rds")
 batting_num <- read_rds("data/21 - Numbers pg HOF Batting.rds")
 awards_shares_b_num <- read_rds("data/21 - Numbers pg HOF Batting Awards Shares.rds")
-fielding_num <- read_rds("data/21 - Numbers pg HOF Fielding.rds")
+fielding_num <- read_rds("data/20 - Numbers pg HOF Fielding.rds") %>% 
+      select(Name, everything())
 pitching_num <- read_rds("data/21 - Numbers pg HOF Pitching.rds")
 awards_shares_p_num <- read_rds("data/21 - Numbers pg HOF Pitching Awards Shares.rds")
 awards_p_num <- read_rds("data/21 - Numbers pg HOF Pitching Awards.rds")
-ps_bat_num <- read_rds("data/21 - Numbers pg HOF Postseason Batting.rds")
-ps_pit_num <- read_rds("data/21 - Numbers pg HOF Postseason Pitching.rds")
-seas_bat_num <- read_rds("data/21 - Numbers pg HOF Season Batting.rds")
-seas_pit_num <- read_rds("data/21 - Numbers pg HOF Season Pitching.rds")
+ps_bat_num <- read_rds("data/20 - Numbers pg HOF Postseason Batting.rds")
+ps_pit_num <- read_rds("data/20 - Numbers pg HOF Postseason Pitching.rds")
+seas_bat_num <- read_rds("data/20 - Numbers pg HOF seas Batting.rds")
+seas_pit_num <- read_rds("data/20 - Numbers pg HOF seas Pitching.rds")
 
 
 
@@ -104,6 +106,7 @@ shinyServer(function(input, output, session){
                   rownames = FALSE,
                   extensions = c("FixedColumns","Buttons"),
                   options = list(language = list(sSearch = "Filter:"),
+                                 search = list(regex = TRUE),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
                                  fixedColumns = list(leftColumns = 1),
@@ -144,6 +147,7 @@ shinyServer(function(input, output, session){
                   rownames = FALSE,
                   extensions = c("FixedColumns","Buttons"),
                   options = list(language = list(sSearch = "Filter:"),
+                                 search = list(regex = TRUE),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
                                  fixedColumns = list(leftColumns = 1),
@@ -178,7 +182,7 @@ shinyServer(function(input, output, session){
                   geom_point(aes(color = Stat), size = 3) +
                   geom_text(data = war_right_label, aes(color = Stat, label = round(Value, 1)), size = 5, hjust = -0.5) +
                   geom_text(data = war_left_label, aes(color = Stat, label = round(Value, 1)), size = 5, hjust = 1.5) +
-                  scale_x_continuous(limits = c(min(war_dot$Value)-10, max(war_dot$Value)+10)) + 
+                  scale_x_continuous(limits = c(min(war_dot$Value)-30, max(war_dot$Value)+28)) +
                   scale_color_manual(labels = c("Typical HOFer (weighted)", "Player"), values = c("#000000", "#C6011F")) +
                   labs(title = "WARtenure") +
                   theme_minimal() +
@@ -216,7 +220,7 @@ shinyServer(function(input, output, session){
                   geom_point(aes(color = Stat), size = 3) +
                   geom_text(data = jaws_right_label, aes(color = Stat, label = round(Value, 1)), size = 5, hjust = -0.5) +
                   geom_text(data = jaws_left_label, aes(color = Stat, label = round(Value, 1)), size = 5, hjust = 1.5) +
-                  scale_x_continuous(limits = c(min(jaws_dot$Value)-10, max(jaws_dot$Value)+10)) + 
+                  scale_x_continuous(limits = c(min(jaws_dot$Value)-30, max(jaws_dot$Value)+28)) +
                   scale_color_manual(labels = c("Typical HOFer (weighted)", "Player"), values = c("#000000", "#C6011F")) +
                   labs(title = "JAWS-4") +
                   theme_minimal() +
@@ -285,6 +289,7 @@ shinyServer(function(input, output, session){
                   extensions = c("FixedColumns"),
                   options = list(dom = 't',
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  initComplete = JS(
                                        "function(settings, json) {",
@@ -307,6 +312,7 @@ shinyServer(function(input, output, session){
                   extensions = c("FixedColumns"),
                   options = list(dom = 't',
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  initComplete = JS(
                                        "function(settings, json) {",
@@ -329,6 +335,7 @@ shinyServer(function(input, output, session){
                   extensions = c("FixedColumns"),
                   options = list(dom = 't',
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  initComplete = JS(
                                        "function(settings, json) {",
@@ -350,6 +357,7 @@ shinyServer(function(input, output, session){
                   extensions = c("FixedColumns"),
                   options = list(dom = 't',
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  initComplete = JS(
                                        "function(settings, json) {",
@@ -372,6 +380,7 @@ shinyServer(function(input, output, session){
                       extensions = c("FixedColumns"),
                       options = list(dom = 't',
                                      scrollX = TRUE,
+                                     search = list(regex = TRUE),
                                      fixedColumns = list(leftColumns = 1),
                                      initComplete = JS(
                                            "function(settings, json) {",
@@ -393,6 +402,7 @@ shinyServer(function(input, output, session){
                   extensions = c("FixedColumns"),
                   options = list(dom = 't',
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  initComplete = JS(
                                        "function(settings, json) {",
@@ -414,6 +424,7 @@ shinyServer(function(input, output, session){
                   extensions = c("FixedColumns"),
                   options = list(dom = 't',
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  initComplete = JS(
                                        "function(settings, json) {",
@@ -492,6 +503,7 @@ shinyServer(function(input, output, session){
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  dom = "Bfrtip",
                                  initComplete = JS(
@@ -513,6 +525,7 @@ shinyServer(function(input, output, session){
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  dom = "Bfrtip",
                                  initComplete = JS(
@@ -535,6 +548,7 @@ shinyServer(function(input, output, session){
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  dom = "Bfrtip",
                                  initComplete = JS(
@@ -556,6 +570,7 @@ shinyServer(function(input, output, session){
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  dom = "Bfrtip",
                                  initComplete = JS(
@@ -1024,6 +1039,7 @@ shinyServer(function(input, output, session){
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  dom = "Bfrtip",
                                  initComplete = JS(
@@ -1035,13 +1051,14 @@ shinyServer(function(input, output, session){
       })
       
       output$numBatSeasTab <- renderDT({
-            as.datatable(
-                  x = seas_bat_num,
+            datatable(
+                  data = seas_bat_num,
                   rownames = FALSE,
                   extensions = c("FixedColumns","Buttons"),
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  dom = "Bfrtip",
                                  initComplete = JS(
@@ -1053,13 +1070,14 @@ shinyServer(function(input, output, session){
       })
       
       output$numBatFldTab <- renderDT({
-            as.datatable(
-                  x = fielding_num,
+            datatable(
+                  data = fielding_num,
                   rownames = FALSE,
                   extensions = c("FixedColumns","Buttons"),
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  dom = "Bfrtip",
                                  initComplete = JS(
@@ -1071,13 +1089,14 @@ shinyServer(function(input, output, session){
       })
       
       output$numBatPsTab <- renderDT({
-            as.datatable(
-                  x = ps_bat_num,
+            datatable(
+                  data = ps_bat_num,
                   rownames = FALSE,
                   extensions = c("FixedColumns","Buttons"),
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  dom = "Bfrtip",
                                  initComplete = JS(
@@ -1090,13 +1109,14 @@ shinyServer(function(input, output, session){
       
       
       output$numBatAwaTab <- renderDT({
-            as.datatable(
-                  x = awards_b_num,
+            datatable(
+                  data = awards_b_num,
                   rownames = FALSE,
                   extensions = c("FixedColumns","Buttons"),
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  dom = "Bfrtip",
                                  initComplete = JS(
@@ -1108,13 +1128,14 @@ shinyServer(function(input, output, session){
       })
       
       output$numBatAsTab <- renderDT({
-            as.datatable(
-                  x = awards_shares_b_num,
+            datatable(
+                  data = awards_shares_b_num,
                   rownames = FALSE,
                   extensions = c("FixedColumns","Buttons"),
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  dom = "Bfrtip",
                                  initComplete = JS(
@@ -1136,6 +1157,7 @@ shinyServer(function(input, output, session){
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  dom = "Bfrtip",
                                  initComplete = JS(
@@ -1147,13 +1169,14 @@ shinyServer(function(input, output, session){
       })
       
       output$numPitSeasTab <- renderDT({
-            as.datatable(
-                  x = seas_pit_num,
+            datatable(
+                  data = seas_pit_num,
                   rownames = FALSE,
                   extensions = c("FixedColumns","Buttons"),
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  dom = "Bfrtip",
                                  initComplete = JS(
@@ -1165,13 +1188,14 @@ shinyServer(function(input, output, session){
       })
       
       output$numPitPsTab <- renderDT({
-            as.datatable(
-                  x = ps_pit_num,
+            datatable(
+                  data = ps_pit_num,
                   rownames = FALSE,
                   extensions = c("FixedColumns","Buttons"),
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  dom = "Bfrtip",
                                  initComplete = JS(
@@ -1184,13 +1208,14 @@ shinyServer(function(input, output, session){
       
       
       output$numPitAwaTab <- renderDT({
-            as.datatable(
-                  x = awards_p_num,
+            datatable(
+                  data = awards_p_num,
                   rownames = FALSE,
                   extensions = c("FixedColumns","Buttons"),
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  dom = "Bfrtip",
                                  initComplete = JS(
@@ -1202,13 +1227,14 @@ shinyServer(function(input, output, session){
       })
       
       output$numPitAsTab <- renderDT({
-            as.datatable(
-                  x = awards_shares_p_num,
+            datatable(
+                  data = awards_shares_p_num,
                   rownames = FALSE,
                   extensions = c("FixedColumns","Buttons"),
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
+                                 search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
                                  dom = "Bfrtip",
                                  initComplete = JS(

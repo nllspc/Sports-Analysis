@@ -4,33 +4,44 @@
 library(tidyverse)
 library(formattable)
 
-
+# Only going to use pitching and batting in shiny but thought add link to the rest just because.
 
 award_shares <- read_rds("data/20 - Numbers pg HOF Award Shares.rds")
 awards <- read_rds("data/20 - Numbers pg HOF Awards.rds")
 batting <- read_rds("data/20 - Numbers pg HOF Batting.rds")
-fielding <- read_rds("data/20 - Numbers pg HOF Fielding.rds")
+fielding <- read_rds("data/20 - Numbers pg wIds HOF Fielding.rds")
 pitching <- read_rds("data/20 - Numbers pg HOF Pitching.rds")
-ps_bat <- read_rds("data/20 - Numbers pg HOF Postseason Batting.rds")
-ps_pit <- read_rds("data/20 - Numbers pg HOF Postseason Pitching.rds")
-seas_bat <- read_rds("data/20 - Numbers pg HOF seas Batting.rds")
-seas_pit <- read_rds("data/20 - Numbers pg HOF seas Pitching.rds")
+ps_bat <- read_rds("data/20 - Numbers pg wIds HOF Postseason Batting.rds")
+ps_pit <- read_rds("data/20 - Numbers pg wIds HOF Postseason Pitching.rds")
+seas_bat <- read_rds("data/20 - Numbers pg wIds HOF seas Batting.rds")
+seas_pit <- read_rds("data/20 - Numbers pg wIds HOF seas Pitching.rds")
+
 
 # Splitting into pitcher/position player
-awards_shares_b <- map_dfr(batting$Name, function(x) {
+awards_shares_b_noId <- map_dfr(batting$Name, function(x) {
       filter(award_shares, Name == x)
-})
-awards_shares_p <- map_dfr(pitching$Name, function(x) {
-      filter(award_shares, Name == x)
-})
+}) %>% 
+      select(-`BBRef Id`, -`FG Id`)
 
-awards_b <- map_dfr(batting$Name, function(x) {
+awards_shares_p_noId <- map_dfr(pitching$Name, function(x) {
+      filter(award_shares, Name == x)
+}) %>% 
+      select(-`BBRef Id`, -`FG Id`)
+
+awards_b_noId <- map_dfr(batting$Name, function(x) {
       filter(awards, Name ==x)
-})
-awards_p <- map_dfr(pitching$Name, function(x) {
+}) %>% 
+      select(-`BBRef Id`, -`FG Id`)
+awards_p_noId <- map_dfr(pitching$Name, function(x) {
       filter(awards, Name ==x) 
-})
+}) %>% 
+      select(-`BBRef Id`, -`FG Id`)
 
+
+write_rds(awards_shares_b_noId, "data/21 - Numbers pg HOF Batting Awards Shares.rds")
+write_rds(awards_shares_p_noId, "data/21 - Numbers pg HOF Pitching Awards Shares.rds")
+write_rds(awards_b_noId, "data/21 - Numbers pg HOF Batting Awards.rds")
+write_rds(awards_p_noId, "data/21 - Numbers pg HOF Pitching Awards.rds")
 
 # Examples of addresses used by bbref and fg
 
@@ -100,10 +111,10 @@ seas_pit_num <- link_FUN(seas_pit)
 
 
 write_rds(batting_num, "data/21 - Numbers pg HOF Batting.rds")
-write_rds(awards_shares_b_num, "data/21 - Numbers pg HOF Batting Awards Shares.rds")
-write_rds(awards_shares_p_num, "data/21 - Numbers pg HOF Pitching Awards Shares.rds")
-write_rds(awards_b_num, "data/21 - Numbers pg HOF Batting Awards.rds")
-write_rds(awards_p_num, "data/21 - Numbers pg HOF Pitching Awards.rds")
+write_rds(awards_shares_b_num, "data/21 - Numbers pg wLinks HOF Batting Awards Shares.rds")
+write_rds(awards_shares_p_num, "data/21 - Numbers pg wLinks HOF Pitching Awards Shares.rds")
+write_rds(awards_b_num, "data/21 - Numbers pg wLinks HOF Batting Awards.rds")
+write_rds(awards_p_num, "data/21 - Numbers pg wLinks HOF Pitching Awards.rds")
 write_rds(fielding_num, "data/21 - Numbers pg HOF Fielding.rds")
 write_rds(pitching_num, "data/21 - Numbers pg HOF Pitching.rds")
 write_rds(ps_bat_num, "data/21 - Numbers pg HOF Postseason Batting.rds")
