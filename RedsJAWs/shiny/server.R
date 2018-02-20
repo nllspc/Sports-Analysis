@@ -98,7 +98,7 @@ seas_pit_num <- read_rds("data/20 - Numbers pg HOF seas Pitching.rds")
 
 shinyServer(function(input, output, session){
       
-      # Home Pg =================
+      # Home Pg ================= 
       
       output$hTable <- renderDT({
             datatable(
@@ -106,6 +106,7 @@ shinyServer(function(input, output, session){
                   rownames = FALSE,
                   extensions = c("FixedColumns","Buttons"),
                   options = list(language = list(sSearch = "Filter:"),
+                                 pageLength = 14,
                                  search = list(regex = TRUE),
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
