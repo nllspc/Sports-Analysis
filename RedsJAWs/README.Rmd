@@ -1,12 +1,9 @@
 ---
 title: "Evaluating Nominees for the Reds Hall of Fame"
 output:
-      html_document:
-            keep_md: true
+      github_document:
             toc: true
-            toc_float:
-                  collapsed: false
-                  smooth_scroll: true
+            
 ---
 
 ![](charts/Home Screen.png)
@@ -24,3 +21,5 @@ Other features include a Hall of Fame score which relates a player's statistics 
 For those unfamilar with shinydashboard and DataTables, there are some basic functions you should be aware of.
 
 1.
+
+![](charts/Home Screen Labelled.png)
