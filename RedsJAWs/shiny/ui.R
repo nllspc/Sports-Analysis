@@ -21,7 +21,9 @@ dashSidebar <- dashboardSidebar(
             menuItem(
                   text = "Home",
                   tabName = "homeTab",
-                  icon = icon("home")
+                  icon = icon("home"),
+                  badgeLabel = "2018 Class",
+                  badgeColor = "light-blue"
             ),
             menuItem(
                   text = "JAWS-4",

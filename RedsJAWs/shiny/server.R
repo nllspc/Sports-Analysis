@@ -80,11 +80,13 @@ sr_fran_prank <- read_rds("data/13 - Franchise Pitching Stats and Ranks.rds")
 # Number Page ====================
 
 awards_b_num <- read_rds("data/21 - Numbers pg HOF Batting Awards.rds")
-batting_num <- read_rds("data/21 - Numbers pg HOF Batting.rds")
+batting_num <- read_rds("data/21 - Numbers pg HOF Batting.rds") %>% 
+      rename(bWAR = WAR)
 awards_shares_b_num <- read_rds("data/21 - Numbers pg HOF Batting Awards Shares.rds")
 fielding_num <- read_rds("data/20 - Numbers pg HOF Fielding.rds") %>% 
       select(Name, everything())
-pitching_num <- read_rds("data/21 - Numbers pg HOF Pitching.rds")
+pitching_num <- read_rds("data/21 - Numbers pg HOF Pitching.rds") %>% 
+      rename(bWAR = WAR)
 awards_shares_p_num <- read_rds("data/21 - Numbers pg HOF Pitching Awards Shares.rds")
 awards_p_num <- read_rds("data/21 - Numbers pg HOF Pitching Awards.rds")
 ps_bat_num <- read_rds("data/20 - Numbers pg HOF Postseason Batting.rds")
@@ -152,7 +154,7 @@ shinyServer(function(input, output, session){
                                  buttons = c("colvis", "csv", "pdf"),
                                  scrollX = TRUE,
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
@@ -251,7 +253,8 @@ shinyServer(function(input, output, session){
                   geom_point_interactive(aes(x = yearId, y = WAR, group = type, tooltip = WAR), color = alpha("#000000", 0.5)) +
                   geom_point_interactive(data = line_filtered, aes(x = yearId, y = WAR, color = type, tooltip = WAR), size = 2.5, shape = 17) +
                   geom_line(aes(x = yearId, y = WAR)) +
-                  geom_hline(aes(yintercept = mean(`Median WAR`), linetype = "Typical HOFer (weighted)"), color = alpha("#C6011F", 0.5), size = 1.25) +
+                  # all the Median WAR is the same; taking mean is just me hacking to get a value instead of a vector for the y-intercept
+                  geom_hline(aes(yintercept = mean(`Median WAR`), linetype = "Typical HOFer"), color = alpha("#C6011F", 0.5), size = 1.25) +
                   scale_linetype_manual(values = 2, guide = guide_legend(override.aes = list(color = "#C6011F"))) +
                   scale_y_continuous(limits = c(min(war_line$WAR)-5, max(war_line$WAR)+5)) +
                   labs(title = "WAR") +
@@ -506,7 +509,7 @@ shinyServer(function(input, output, session){
                                  scrollX = TRUE,
                                  search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
@@ -528,7 +531,7 @@ shinyServer(function(input, output, session){
                                  scrollX = TRUE,
                                  search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
@@ -551,7 +554,7 @@ shinyServer(function(input, output, session){
                                  scrollX = TRUE,
                                  search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
@@ -573,7 +576,7 @@ shinyServer(function(input, output, session){
                                  scrollX = TRUE,
                                  search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
@@ -1042,7 +1045,8 @@ shinyServer(function(input, output, session){
                                  scrollX = TRUE,
                                  search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 columnDefs = list(list(className = 'dt-center', targets = '_all')),
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
@@ -1055,13 +1059,14 @@ shinyServer(function(input, output, session){
             datatable(
                   data = seas_bat_num,
                   rownames = FALSE,
-                  extensions = c("FixedColumns","Buttons"),
+                  extensions = c("FixedColumns", "Buttons"),
                   options = list(language = list(sSearch = "Filter:"),
                                  buttons = c("colvis", "csv", "pdf"),
+                                 fixedColumns = list(leftColumns = 1),
+                                 columnDefs = list(list(className = 'dt-center', targets = '_all')),
                                  scrollX = TRUE,
                                  search = list(regex = TRUE),
-                                 fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
@@ -1080,7 +1085,7 @@ shinyServer(function(input, output, session){
                                  scrollX = TRUE,
                                  search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
@@ -1099,7 +1104,8 @@ shinyServer(function(input, output, session){
                                  scrollX = TRUE,
                                  search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 columnDefs = list(list(className = 'dt-center', targets = '_all')),
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
@@ -1119,7 +1125,7 @@ shinyServer(function(input, output, session){
                                  scrollX = TRUE,
                                  search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
@@ -1138,7 +1144,7 @@ shinyServer(function(input, output, session){
                                  scrollX = TRUE,
                                  search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
@@ -1160,7 +1166,8 @@ shinyServer(function(input, output, session){
                                  scrollX = TRUE,
                                  search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 columnDefs = list(list(className = 'dt-center', targets = '_all')),
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
@@ -1179,7 +1186,8 @@ shinyServer(function(input, output, session){
                                  scrollX = TRUE,
                                  search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 columnDefs = list(list(className = 'dt-center', targets = '_all')),
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
@@ -1198,7 +1206,8 @@ shinyServer(function(input, output, session){
                                  scrollX = TRUE,
                                  search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 columnDefs = list(list(className = 'dt-center', targets = '_all')),
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
@@ -1218,7 +1227,7 @@ shinyServer(function(input, output, session){
                                  scrollX = TRUE,
                                  search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",
@@ -1237,7 +1246,7 @@ shinyServer(function(input, output, session){
                                  scrollX = TRUE,
                                  search = list(regex = TRUE),
                                  fixedColumns = list(leftColumns = 1),
-                                 dom = "Bfrtip",
+                                 dom = "Bfrtlip",
                                  initComplete = JS(
                                        "function(settings, json) {",
                                        "$(this.api().table().header()).css({'background-color': '#C6011F', 'color': '#FFF'});",

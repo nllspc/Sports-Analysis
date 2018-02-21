@@ -103,7 +103,7 @@ war_combined <- notWar4_pos %>%
       bind_rows(inWar4_pos)
 
 
-# Map weighted averages
+# Map averages by position/pitcher
 
 #  Positional Average seasonal WAR values
 

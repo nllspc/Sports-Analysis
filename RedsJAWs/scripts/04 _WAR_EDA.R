@@ -7,9 +7,9 @@ library(openWARData)
 library(Lahman)
 
 
-indIdComp <- read_rds("./data/inducteeIdsComplete.rds")
-nomId <- read_rds("./data/nomineeIds.rds")
-members <- read_rds("./data/memberScrape.rds")
+indIdComp <- read_rds("data/02 - inducteeIdsComplete.rds")
+nomId <- read_rds("data/02 - nomineeIds.rds")
+members <- read_rds("data/01 - memberScrape.rds")
 
 # Making a list of inductee IDs
 indIdCompList <- list(indIdComp$playerId)
@@ -56,7 +56,7 @@ lowerThresh
 
 # Threshold Analysis ------------------------------------------------------------------------------
 
-# If I stick with 7yrs, that nets me 78% of the inductees available and it'll stay consistent with MLB JAWS.
+# If I stick with 7yrs, that nets me 67% of the inductees with WAR stats available and it'll stay consistent with MLB JAWS. With 6yrs, that's 78%; with 5yrs, 86%; with 4yrs, 92%.
 table(redsYrCount$tenure)
 
 # Lets see when the 7yrs and under guys played and who they are.
@@ -79,7 +79,7 @@ bSev2Dat <- map_dfr(belowSevenList, bSev2Filter)
 
 # Seaver has six seasons and Dave "the Cobra" Parker has four. I am loathe to cut the Cobra out of ANYTHING so starting RedsJAWS threshold will be four best seasons as a Red. I'm going to leave it to others to convince me that it should be 5, 6, or 7. Don't think having it at four will affect the workflow much. grangwa01, mckecbi01, and werbebi01 are out.
 playersCut <- redsYrCount %>% 
-      filter(tenure<4)
+      filter(tenure<5)
 
 
 
