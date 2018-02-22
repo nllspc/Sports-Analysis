@@ -7,6 +7,10 @@ Evaluating Nominees for the Reds Hall of Fame
     -   [Home](#home)
     -   [JAWS-4](#jaws-4)
     -   [Profile](#profile)
+    -   [Stat Rank](#stat-rank)
+    -   [Numbers](#numbers)
+-   [Notes](#notes)
+-   [Acknowledgements](#acknowledgements)
 
 Introduction
 ------------
@@ -54,12 +58,37 @@ The text input allows the user to select a player. Then dot plots are rendered t
 
 Tables show various statistical categories while the deviation plot gives a calculated score that relates the player's statistics to a typical Hall of Famer. The score gives users an estimate of where the player has excelled and faltered which many bolster or hinder his case. It also provides the user with an idea of which statistics to examine further on the Stat Rank page.
 
-|   Rating  | Score (z) |
-|:---------:|:---------:|
-| Excellent |     2     |
-|    Good   |    0.5    |
-|   Median  |     0     |
-|    Poor   |    -0.5   |
-|   Awful   |     -2    |
+|   Rating  | Score |
+|:---------:|:-----:|
+| Excellent |   2   |
+|    Good   |  0.5  |
+|   Median  |   0   |
+|    Poor   |  -0.5 |
+|   Awful   |   -2  |
 
 ![](charts/Profile%20page.png)
+
+### Stat Rank
+
+Ranks and percentiles of player statistics for both the Hall of Fame and franchise history can viewed on this page. There are also Hall of Fame and franchise tables so the user can see which players rank above and below the nominee.
+
+![](charts/Stat%20Rank%20page%20Pitching.png) ![](charts/Stat%20Rank%20page%20Franchise.png)
+
+### Numbers
+
+Here the user can have all the stats in front of them and compare players. Also, clickable links to player pages at Baseball-Reference and FanGraphs are provided under the Id columns.
+
+![](charts/Numbers%20page%20Batting.png)
+
+Notes
+-----
+
+-   To qualify for the JAWS-4 calculation the player must have been tenured with the Reds for at least 4 seasons.
+-   To qualify for other statistical tables players needed at least 1500 plate appearances or 500 innings.
+-   Known issues and inconsistencies are listed and discussed here.
+-   Discussion about the decision-making involved in the calculations is here.
+
+Acknowledgements
+----------------
+
+-   Data for this project was gathered from [Baseball-Reference](https://www.baseball-reference.com), [FanGraphs](https://www.fangraphs.com)
