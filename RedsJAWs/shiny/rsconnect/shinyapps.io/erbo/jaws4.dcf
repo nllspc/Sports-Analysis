@@ -5,6 +5,6 @@ account: erbo
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 286585
-bundleId: 1234200
+bundleId: 1237469
 url: https://erbo.shinyapps.io/jaws4/
-when: 1519254318.79767
+when: 1519433055.33409

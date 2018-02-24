@@ -9,8 +9,6 @@ library(DT)
 # Ridge Plots
 library(ggridges)
 library(viridis)
-library(cowplot)
-library(ggbeeswarm)
 
 # Interactive Line Chart
 library(ggiraph)
@@ -91,7 +89,8 @@ awards_shares_p_num <- read_rds("data/21 - Numbers pg HOF Pitching Awards Shares
 awards_p_num <- read_rds("data/21 - Numbers pg HOF Pitching Awards.rds")
 ps_bat_num <- read_rds("data/20 - Numbers pg HOF Postseason Batting.rds")
 ps_pit_num <- read_rds("data/20 - Numbers pg HOF Postseason Pitching.rds")
-seas_bat_num <- read_rds("data/20 - Numbers pg HOF seas Batting.rds")
+seas_bat_num <- read_rds("data/20 - Numbers pg HOF seas Batting.rds") %>% 
+      rename(`2B` = X2B, `3B` = X3B)
 seas_pit_num <- read_rds("data/20 - Numbers pg HOF seas Pitching.rds")
 
 

@@ -1,7 +1,7 @@
 # JAWS splash visual
 
 
-
+# Ended up using DT tables
 library(tidyverse)
 library(knitr)
 library(kableExtra)

@@ -4,9 +4,10 @@
 
 
 library(tidyverse)
+# Don't think I used broom here
 library(broom)
 library(rlang)
-library(scales)
+
 
 
 # Reds HOF inductee and nominee war and jaws (career) stats

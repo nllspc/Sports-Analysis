@@ -11,6 +11,9 @@ Evaluating Nominees for the Reds Hall of Fame
     -   [Numbers](#numbers)
 -   [Notes](#notes)
 -   [Acknowledgements](#acknowledgements)
+    -   [Data](#data)
+    -   [Packages](#packages)
+    -   [Support](#support)
 
 Introduction
 ------------
@@ -28,12 +31,12 @@ For those unfamilar with shinydashboard and DataTables, there are some basic fun
 1.  The toggle button in the header collapses/displays the sidebar.
 2.  The column visibility button adds/removes columns from view.
 3.  The PDF and CSV buttons download the data from that table in .pdf and .csv format.
-    1.  PDF: If the rows are filtered, then only those rows will be present in the downloaded document. It includes only rows on page 1 of the table. The number of entries per page can be specified at the bottom left corner of many of the tables. Regardless of which columns are visible, all columns will be included. Unfortunately there is a maximum of 19 columns can be printed in the document.
+    1.  PDF: If the rows are filtered, then only those rows will be present in the downloaded document. It includes only rows on page 1 of the table. The number of entries per page can be specified at the bottom left corner of many of the tables. Regardless of which columns are visible, all columns will be included up to a maximum of 19 columns.
     2.  CSV: Only difference from PDF is that there is no column limit. So every column is included regardless of the size of the table.
 4.  The filter window uses [regex](https://www.regular-expressions.info) to filter the table. Note: you cannot specify the column to which the search criteria is applied. Examples:
-    1.  bench|rose|Larkin returns rows that correspond to those players -- so will ben|bar|ros (along with Ernie Lombardi)
+    1.  bench|rose|Larkin returns rows that correspond to those players -- ben|bar|ros will also return those players (along with Ernie Lombardi).
     2.  e$ returns players whose names end in "e" like Bid McPhee but not Joe Morgan. b$ can also be used to select all rows with position equal to 1B, 2B, or 3B.
-    3.  ^e returns players name that begin with the letter "e" such as Eric Davis
+    3.  ^e returns players' names that begin with the letter "e" such as Eric Davis
     4.  ^\[ep\] returns all players whose name begins with an "e" or a "p" but also returns every pitcher.
     5.  Numbers may also be used. 3358 will return all rows with that string of numbers in that order.
 
@@ -58,6 +61,8 @@ The text input allows the user to select a player. Then dot plots are rendered t
 
 Tables show various statistical categories while the deviation plot gives a calculated score that relates the player's statistics to a typical Hall of Famer. The score gives users an estimate of where the player has excelled and faltered which many bolster or hinder his case. It also provides the user with an idea of which statistics to examine further on the Stat Rank page.
 
+Rough Guide:
+
 |   Rating  | Score |
 |:---------:|:-----:|
 | Excellent |   2   |
@@ -70,7 +75,7 @@ Tables show various statistical categories while the deviation plot gives a calc
 
 ### Stat Rank
 
-Ranks and percentiles of player statistics for both the Hall of Fame and franchise history can viewed on this page. There are also Hall of Fame and franchise tables so the user can see which players rank above and below the nominee.
+Ranks and percentiles of player statistics for both the Hall of Fame and franchise history can be viewed on this page. There are also Hall of Fame and franchise tables so the user can see which players rank above and below the nominee.
 
 ![](charts/Stat%20Rank%20page%20Pitching.png) ![](charts/Stat%20Rank%20page%20Franchise.png)
 
@@ -83,12 +88,42 @@ Here the user can have all the stats in front of them and compare players. Also,
 Notes
 -----
 
+-   All tables contain both nominees and inducteees.
 -   To qualify for the JAWS-4 calculation the player must have been tenured with the Reds for at least 4 seasons.
 -   To qualify for other statistical tables players needed at least 1500 plate appearances or 500 innings.
 -   Known issues and inconsistencies are listed and discussed here.
--   Discussion about the decision-making involved in the calculations is here.
+-   Explanation about the decision-making involved in the calculations is here.
 
 Acknowledgements
 ----------------
 
--   Data for this project was gathered from [Baseball-Reference](https://www.baseball-reference.com), [FanGraphs](https://www.fangraphs.com)
+### Data
+
+Data for this project was gathered from [Baseball-Reference](https://www.baseball-reference.com), [FanGraphs](https://www.fangraphs.com), and [Sean Lahman's Baseball Database](http://lahman.r-forge.r-project.org/)
+
+### Packages
+
+-   [broom](http://github.com/tidyverse/broom)
+-   [DT](https://rstudio.github.io/DT)
+-   [formattable](https://github.com/renkun-ken/formattable)
+-   [ggiraph](https://davidgohel.github.io/ggiraph)
+-   [ggpubr](http://www.sthda.com/english/rpkgs/ggpubr)
+-   [ggridges](https://github.com/clauswilke/ggridges)
+-   [Lahman](http://r-forge.r-project.org/R/?group_id=1221)
+-   [knitr](https://yihui.name/knitr/)
+-   [openWARData](https://github.com/beanumber/openWARData)
+-   [plyr](https://github.com/hadley/plyr)
+-   [rlang](https://github.com/tidyverse/rlang)
+-   [rvest](https://github.com/hadley/rvest)
+-   [shiny](http://shiny.rstudio.com)
+-   [shinydashboard](http://rstudio.github.io/shinydashboard/)
+-   [tidyverse](https://github.com/tidyverse/tidyverse)
+-   [viridis](https://github.com/sjmgarnier/viridis)
+
+### Support
+
+**Special Thanks to**
+
+<img src="charts/louisville-rstats-hex.png" width="200px" height="200px" />
+
+**Louisville RStats**
