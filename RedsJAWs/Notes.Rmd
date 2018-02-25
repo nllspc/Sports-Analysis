@@ -1,7 +1,7 @@
 ---
 title: "Notes"
 output:
-      github_document:
+      html_document:
             toc: true
 ---
 
@@ -36,6 +36,8 @@ Lastly, I looked at the nominees and it turns out Scott Rolen only played four s
 
 This score is just a standardization of the player stats. There are many standardization methods and I didn't want to wade to deep into the area. I looked at two: one uses mean and standard deviation and the other uses median and MAD.
 
-1. $$\left (\frac{(\text{value} - \text{median})}{\text{MAD}}\right)$$
-
-2. $\text{score} = \frac{(\text{value} - \text{mean})} {\text{sd}}$
+$$
+\begin{align}
+      \text{score} = \frac{\text{value} - \text{median}}{\text{MAD}} && \text{score} = \frac{\text{value} -           \text{mean}}{\text{sd}}
+\end{align}
+$$
