@@ -122,8 +122,15 @@ Data for this project was gathered from [Baseball-Reference](https://www.basebal
 
 ### Support
 
-**Special Thanks to**
+<center>
+Special Thanks to
 
+</center>
+<center>
 <img src="charts/louisville-rstats-hex.png" width="200px" height="200px" />
 
-**Louisville RStats**
+</center>
+<center>
+<a href="https://github.com/louisville-rstats">Louisville RStats</a>
+
+</center>

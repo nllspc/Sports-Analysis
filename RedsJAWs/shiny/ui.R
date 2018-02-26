@@ -6,8 +6,9 @@ library(shiny)
 library(shinydashboard)
 library(DT)
 library(ggiraph)
+library(shinycssloaders)
 
-
+options(spinner.color="#C6011F")
 
 dashHeader <- dashboardHeader(
       title="Evaluating Nominees for the Reds HOF",
@@ -124,17 +125,17 @@ dashBody <- dashboardBody(
                               
                               box(
                                     width = 6,
-                                    plotOutput(outputId = 'jawsCleve')
+                                    withSpinner(plotOutput(outputId = 'jawsCleve'), type=1)
                               ),
                               box(
                                     width = 6,
-                                    plotOutput(outputId = 'warCleve')
+                                    withSpinner(plotOutput(outputId = 'warCleve'), type=1)
                               ),
                               
                               box(
                                     width = 12,
                                     height = 380,
-                                    ggiraphOutput(outputId = 'lineChart')
+                                    withSpinner(ggiraphOutput(outputId = 'lineChart'), type=1)
                               )
                               
                         )
@@ -163,7 +164,7 @@ dashBody <- dashboardBody(
                                                 label = 'Enter Player Name',
                                                 value = 'Ken Griffey Jr'
                                           ),
-                                          plotOutput(outputId = 'bat_dev'),
+                                          withSpinner(plotOutput(outputId = 'bat_dev'), type=1),
                                           DTOutput(outputId = 'prof_awab_Table')
                                     )
                               ),
@@ -182,7 +183,7 @@ dashBody <- dashboardBody(
                                                 label = 'Enter Player Name',
                                                 value = 'Jose Rijo'
                                           ),
-                                          plotOutput(outputId = 'pit_dev')
+                                          withSpinner(plotOutput(outputId = 'pit_dev'), type=1)
                                     )
                               )
                         )
@@ -213,7 +214,7 @@ dashBody <- dashboardBody(
                                                       value = 'Eric Davis'
                                                 ),
                                                 htmlOutput("hof_bvalue_box"),
-                                                plotOutput(outputId = 'hof_bat_dens')
+                                                withSpinner(plotOutput(outputId = 'hof_bat_dens'), type=1)
                                           ),
                                           box(
                                                 width = 6,
@@ -224,7 +225,7 @@ dashBody <- dashboardBody(
                                                 ),
                                                 
                                                 htmlOutput("fran_bvalue_box"),
-                                                plotOutput(outputId = 'fran_bat_dens')
+                                                withSpinner(plotOutput(outputId = 'fran_bat_dens'), type=1)
                                                 
                                           )
                                     ),
@@ -250,7 +251,7 @@ dashBody <- dashboardBody(
                                                       value = 'Bucky Walters'
                                                 ),
                                                 htmlOutput("hof_pvalue_box"),
-                                                plotOutput(outputId = 'hof_pit_dens')
+                                                withSpinner(plotOutput(outputId = 'hof_pit_dens'), type=1)
                                           ),
                                           box(
                                                 width = 6,
@@ -260,7 +261,7 @@ dashBody <- dashboardBody(
                                                       value = 'ERA+'
                                                 ),
                                                 htmlOutput("fran_pvalue_box"),
-                                                plotOutput(outputId = 'fran_pit_dens')
+                                                withSpinner(plotOutput(outputId = 'fran_pit_dens'), type=1)
                                           )
                                     ),
                                     DTOutput(outputId = 'sr_fran_pTable')

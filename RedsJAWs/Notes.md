@@ -12,8 +12,7 @@ The four-season-tenured constraint was decided upon by examining the distributio
 
 I began by looking at common outlier measurements regarding the tenures of inductees and focused on values on the low end. There isn't a concern with players playing *too* long for JAWS calculation. Hopefully this would give me baseline from where I could start a decision process.
 
-1.  ![\\text{threshold} = \\text{median} - 2\*\\text{MAD} = 3.0696](https://latex.codecogs.com/png.latex?%5Ctext%7Bthreshold%7D%20%3D%20%5Ctext%7Bmedian%7D%20-%202%2A%5Ctext%7BMAD%7D%20%3D%203.0696 "\text{threshold} = \text{median} - 2*\text{MAD} = 3.0696")
-2.  ![\\text{threshold} = \\text{1st quartile} - 1.5\*\\text{IQR} = 1](https://latex.codecogs.com/png.latex?%5Ctext%7Bthreshold%7D%20%3D%20%5Ctext%7B1st%20quartile%7D%20-%201.5%2A%5Ctext%7BIQR%7D%20%3D%201 "\text{threshold} = \text{1st quartile} - 1.5*\text{IQR} = 1")
+![\\text{threshold} = \\text{median} - 2\*\\text{MAD} = 3.0696](https://latex.codecogs.com/png.latex?%5Ctext%7Bthreshold%7D%20%3D%20%5Ctext%7Bmedian%7D%20-%202%2A%5Ctext%7BMAD%7D%20%3D%203.0696 "\text{threshold} = \text{median} - 2*\text{MAD} = 3.0696") ![\\text{threshold} = \\text{1st quartile} - 1.5\*\\text{IQR} = 1](https://latex.codecogs.com/png.latex?%5Ctext%7Bthreshold%7D%20%3D%20%5Ctext%7B1st%20quartile%7D%20-%201.5%2A%5Ctext%7BIQR%7D%20%3D%201 "\text{threshold} = \text{1st quartile} - 1.5*\text{IQR} = 1")
 
 These values weren't very helpful to be honest. A one year floor wasn't worth considering. Three years seemed low, too. So these values didn't give me a desirable statistical floor.
 
@@ -38,12 +37,6 @@ Hall of Fame Score
 
 This score is just a standardization of the player stats. There are many standardization methods and I didn't want to wade to deep into the area. I looked at two: one uses mean and standard deviation and the other uses median and MAD.
 
-![
-\\begin{align}
-      \\text{score} = \\frac{\\text{value} - \\text{median}}{\\text{MAD}} && \\text{score} = \\frac{\\text{value} -           \\text{mean}}{\\text{sd}}
-\\end{align}
-](https://latex.codecogs.com/png.latex?%0A%5Cbegin%7Balign%7D%0A%20%20%20%20%20%20%5Ctext%7Bscore%7D%20%3D%20%5Cfrac%7B%5Ctext%7Bvalue%7D%20-%20%5Ctext%7Bmedian%7D%7D%7B%5Ctext%7BMAD%7D%7D%20%26%26%20%5Ctext%7Bscore%7D%20%3D%20%5Cfrac%7B%5Ctext%7Bvalue%7D%20-%20%20%20%20%20%20%20%20%20%20%20%5Ctext%7Bmean%7D%7D%7B%5Ctext%7Bsd%7D%7D%0A%5Cend%7Balign%7D%0A "
-\begin{align}
-      \text{score} = \frac{\text{value} - \text{median}}{\text{MAD}} && \text{score} = \frac{\text{value} -           \text{mean}}{\text{sd}}
-\end{align}
-")
+![\\text{score} = \\frac{\\text{value} - \\text{median}}{\\text{MAD}}](https://latex.codecogs.com/png.latex?%5Ctext%7Bscore%7D%20%3D%20%5Cfrac%7B%5Ctext%7Bvalue%7D%20-%20%5Ctext%7Bmedian%7D%7D%7B%5Ctext%7BMAD%7D%7D "\text{score} = \frac{\text{value} - \text{median}}{\text{MAD}}")
+
+![\\text{score} = \\frac{\\text{value} - \\text{mean}}{\\text{sd}}](https://latex.codecogs.com/png.latex?%5Ctext%7Bscore%7D%20%3D%20%5Cfrac%7B%5Ctext%7Bvalue%7D%20-%20%5Ctext%7Bmean%7D%7D%7B%5Ctext%7Bsd%7D%7D "\text{score} = \frac{\text{value} - \text{mean}}{\text{sd}}")

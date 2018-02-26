@@ -1,8 +1,9 @@
 ---
 title: "Notes"
 output:
-      html_document:
+      github_document:
             toc: true
+            pandoc_args: --webtex
 ---
 
 
@@ -12,8 +13,8 @@ The four-season-tenured constraint was decided upon by examining the distributio
 
 I began by looking at common outlier measurements regarding the tenures of inductees and focused on values on the low end. There isn't a concern with players playing *too* long for JAWS calculation. Hopefully this would give me baseline from where I could start a decision process.
 
-1. $\text{threshold} = \text{median} - 2*\text{MAD} = 3.0696$
-2. $\text{threshold} = \text{1st quartile} - 1.5*\text{IQR} = 1$
+$\text{threshold} = \text{median} - 2*\text{MAD} = 3.0696$
+$\text{threshold} = \text{1st quartile} - 1.5*\text{IQR} = 1$
 
 These values weren't very helpful to be honest. A one year floor wasn't worth considering. Three years seemed low, too. So these values didn't give me a desirable statistical floor.
 
@@ -36,8 +37,6 @@ Lastly, I looked at the nominees and it turns out Scott Rolen only played four s
 
 This score is just a standardization of the player stats. There are many standardization methods and I didn't want to wade to deep into the area. I looked at two: one uses mean and standard deviation and the other uses median and MAD.
 
-$$
-\begin{align}
-      \text{score} = \frac{\text{value} - \text{median}}{\text{MAD}} && \text{score} = \frac{\text{value} -           \text{mean}}{\text{sd}}
-\end{align}
-$$
+$\text{score} = \frac{\text{value} - \text{median}}{\text{MAD}}$
+      
+$\text{score} = \frac{\text{value} - \text{mean}}{\text{sd}}$
