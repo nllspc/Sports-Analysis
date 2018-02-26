@@ -105,6 +105,7 @@ Data for this project was gathered from [Baseball-Reference](https://www.basebal
 * [rlang]( https://github.com/tidyverse/rlang)
 * [rvest](https://github.com/hadley/rvest)
 * [shiny]( http://shiny.rstudio.com)
+* [shinycssloaders](https://github.com/lukehaas/css-loaders)
 * [shinydashboard]( http://rstudio.github.io/shinydashboard/)
 * [tidyverse](https://github.com/tidyverse/tidyverse)
 * [viridis]( https://github.com/sjmgarnier/viridis)

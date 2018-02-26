@@ -18,7 +18,7 @@ Evaluating Nominees for the Reds Hall of Fame
 Introduction
 ------------
 
-The purpose of this [app](https://erbo.shinyapps.io/jaws4/) is to provide tools to evaluate nominees for the Reds Hall of Fame. Its primary feature is the JAWS-4 statistic. JAWS-4 is a version of Jay Jaffe's JAWS statistic that's been modified to apply to a franchise's Hall of Fame.
+The purpose of this [dashboard](https://erbo.shinyapps.io/jaws4/) is to provide tools to evaluate nominees for the Reds Hall of Fame. Its primary feature is the JAWS-4 statistic. JAWS-4 is a version of Jay Jaffe's JAWS statistic that's been modified to apply to a franchise's Hall of Fame.
 
 The JAWS statistic is meant to be a starting point in the discussion of a nominee's creditials for the Hall of Fame. Jaffe provides a more thorough explanation [here](https://www.si.com/mlb/2017/11/27/hall-fame-jaws-intro-2018-ballot). There's also a more succinct description at [Baseball-Reference](https://www.baseball-reference.com/about/jaws.shtml).
 
@@ -88,6 +88,7 @@ Here the user can have all the stats in front of them and compare players. Also,
 Notes
 -----
 
+-   When entering player names and stats, entries are case sensitive.
 -   All tables contain both nominees and inducteees.
 -   To qualify for the JAWS-4 calculation the player must have been tenured with the Reds for at least 4 seasons.
 -   To qualify for other statistical tables players needed at least 1500 plate appearances or 500 innings.
@@ -116,6 +117,7 @@ Data for this project was gathered from [Baseball-Reference](https://www.basebal
 -   [rlang](https://github.com/tidyverse/rlang)
 -   [rvest](https://github.com/hadley/rvest)
 -   [shiny](http://shiny.rstudio.com)
+-   [shinycssloaders](https://github.com/lukehaas/css-loaders)
 -   [shinydashboard](http://rstudio.github.io/shinydashboard/)
 -   [tidyverse](https://github.com/tidyverse/tidyverse)
 -   [viridis](https://github.com/sjmgarnier/viridis)
