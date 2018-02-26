@@ -3,6 +3,7 @@ Notes
 
 -   [Eligibility for the JAWS calculation](#eligibility-for-the-jaws-calculation)
 -   [Choosing Primary Positions](#choosing-primary-positions)
+-   [Weights](#weights)
 -   [Hall of Fame Score](#hall-of-fame-score)
 
 Eligibility for the JAWS calculation
@@ -35,6 +36,11 @@ Choosing Primary Positions
 --------------------------
 
 Jaffe chooses primary positions according to the most WAR accumulated at a position. I had access to WAR per season but not per position and the information in the databases wasn't sufficient for me to perform the calculation. So I went with most games at a position during Reds tenure.
+
+Weights
+-------
+
+Since there are different numbers of players enshrined in the HOF at each position, he evens out the position counts by adding "average" HOF players to each position (excluding pitcher) until the count at each position reaches the amount of the position that has the most players. From my understanding, he uses the mean. I'm using the median due to skewness of the distributions.
 
 Hall of Fame Score
 ------------------
