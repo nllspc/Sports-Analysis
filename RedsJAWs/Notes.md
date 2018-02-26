@@ -12,7 +12,9 @@ The four-season-tenured constraint was decided upon by examining the distributio
 
 I began by looking at common outlier measurements regarding the tenures of inductees and focused on values on the low end. There isn't a concern with players playing *too* long for JAWS calculation. Hopefully this would give me baseline from where I could start a decision process.
 
-![\\text{threshold} = \\text{median} - 2\*\\text{MAD} = 3.0696](https://latex.codecogs.com/png.latex?%5Ctext%7Bthreshold%7D%20%3D%20%5Ctext%7Bmedian%7D%20-%202%2A%5Ctext%7BMAD%7D%20%3D%203.0696 "\text{threshold} = \text{median} - 2*\text{MAD} = 3.0696") ![\\text{threshold} = \\text{1st quartile} - 1.5\*\\text{IQR} = 1](https://latex.codecogs.com/png.latex?%5Ctext%7Bthreshold%7D%20%3D%20%5Ctext%7B1st%20quartile%7D%20-%201.5%2A%5Ctext%7BIQR%7D%20%3D%201 "\text{threshold} = \text{1st quartile} - 1.5*\text{IQR} = 1")
+![\\text{threshold} = \\text{median} - 2\*\\text{MAD} = 3.0696](https://latex.codecogs.com/png.latex?%5Ctext%7Bthreshold%7D%20%3D%20%5Ctext%7Bmedian%7D%20-%202%2A%5Ctext%7BMAD%7D%20%3D%203.0696 "\text{threshold} = \text{median} - 2*\text{MAD} = 3.0696")
+
+![\\text{threshold} = \\text{1st quartile} - 1.5\*\\text{IQR} = 1](https://latex.codecogs.com/png.latex?%5Ctext%7Bthreshold%7D%20%3D%20%5Ctext%7B1st%20quartile%7D%20-%201.5%2A%5Ctext%7BIQR%7D%20%3D%201 "\text{threshold} = \text{1st quartile} - 1.5*\text{IQR} = 1")
 
 These values weren't very helpful to be honest. A one year floor wasn't worth considering. Three years seemed low, too. So these values didn't give me a desirable statistical floor.
 
@@ -25,18 +27,22 @@ Next I looked at the histogram and table of the different tenure values to see w
 |  5 yrs |     86%     |
 |  4 yrs |     92%     |
 
-From here, the choice narrowed to four or five years. Now I wanted to see who would be left out at each cutoff. While I am a Reds fan, I am not well-versed in their history. So it's quite possible that there are some historically famous players on these two lists that I'm not aware of, but I did recognize one name, Dave "The Cobra" Parker. Mr. Parker only had four seasons with the Reds. If you look at his WAR, he had one good season and the others were poor, but if you look closer he got dinged heavily for his defense and was pretty good offensively, especially in 1985. WAR is what matters here though and Dave is lacking. It also shouldn't matter that he's a hometown kid, his nickname is **The Cobra**, and used to swing a sledge hammer in the batter's circle. I decided to stick a pin in it.
+From here, the choice narrowed to four or five years.
 
 Lastly, I looked at the nominees and it turns out Scott Rolen only played four seasons. The goal of this project is to evaluate nominees so four years would be the necessary cutoff in order for Rolen to be included. Yeah, I should've checked that out to begin with. I don't consider this subject closed though and plan on revisiting it in the future. Your opinions are welcome. So the inductees that didn't make it were the following: Billy Werber, Bill McKechnie, and Wayne Granger. The Wright boys, George and Harry, also aren't in there. They played with the Reds before 1871 and their WAR wasn't available.
 
 Choosing Primary Positions
 --------------------------
 
+Jaffe chooses primary positions according to the most WAR accumulated at a position. I had access to WAR per season but not per position and the information in the databases wasn't sufficient for me to perform the calculation. So I went with most games at a position during Reds tenure.
+
 Hall of Fame Score
 ------------------
 
-This score is just a standardization of the player stats. There are many standardization methods and I didn't want to wade to deep into the area. I looked at two: one uses mean and standard deviation and the other uses median and MAD.
+This score is just a standardization of the player stats. There are many standardization methods but I didn't want to wade to deep into the area. I looked at two: one uses mean and standard deviation and the other uses median and MAD.
 
-![\\text{score} = \\frac{\\text{value} - \\text{median}}{\\text{MAD}}](https://latex.codecogs.com/png.latex?%5Ctext%7Bscore%7D%20%3D%20%5Cfrac%7B%5Ctext%7Bvalue%7D%20-%20%5Ctext%7Bmedian%7D%7D%7B%5Ctext%7BMAD%7D%7D "\text{score} = \frac{\text{value} - \text{median}}{\text{MAD}}")
+![\\text{score} = \\frac{\\text{player stat value} - \\text{HOF stat median}}{\\text{HOF stat MAD}}](https://latex.codecogs.com/png.latex?%5Ctext%7Bscore%7D%20%3D%20%5Cfrac%7B%5Ctext%7Bplayer%20stat%20value%7D%20-%20%5Ctext%7BHOF%20stat%20median%7D%7D%7B%5Ctext%7BHOF%20stat%20MAD%7D%7D "\text{score} = \frac{\text{player stat value} - \text{HOF stat median}}{\text{HOF stat MAD}}")
 
-![\\text{score} = \\frac{\\text{value} - \\text{mean}}{\\text{sd}}](https://latex.codecogs.com/png.latex?%5Ctext%7Bscore%7D%20%3D%20%5Cfrac%7B%5Ctext%7Bvalue%7D%20-%20%5Ctext%7Bmean%7D%7D%7B%5Ctext%7Bsd%7D%7D "\text{score} = \frac{\text{value} - \text{mean}}{\text{sd}}")
+![\\text{score} = \\frac{\\text{player stat value} - \\text{HOF stat mean}}{\\text{HOF stat sd}}](https://latex.codecogs.com/png.latex?%5Ctext%7Bscore%7D%20%3D%20%5Cfrac%7B%5Ctext%7Bplayer%20stat%20value%7D%20-%20%5Ctext%7BHOF%20stat%20mean%7D%7D%7B%5Ctext%7BHOF%20stat%20sd%7D%7D "\text{score} = \frac{\text{player stat value} - \text{HOF stat mean}}{\text{HOF stat sd}}")
+
+I won't get into all the pros and cons. I'll just say I decided to go with the median/MAD method because of the skewness of many of the stat distributions. From briefly looking at both of the methods' results, I didn't find much difference. I tried to capture most of the variance between the two methods by setting the median in the scale (README.md) at -0.5 &lt; score &lt; 0.5.
