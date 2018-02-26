@@ -53,7 +53,7 @@ This page shows the current JAWS median values and weighted median values for ea
 
 ### JAWS-4
 
-The text input allows the user to select a player. Then dot plots are rendered that show how that player's total WAR as a Red and his JAWS4 score compare with that of a typical Hall of Famer. The line chart shows the player's WAR for every year he was a Red. Hovering over each point displays its value.
+The text input allows the user to select a player. Then dot plots are rendered that show how that player's total WAR as a Red and his JAWS4 score compare with that of a typical Hall of Famer. The line chart shows the player's WAR for every year he was a Red. Hovering over each point displays its value. The horizontal dashed line is one of two values: the median WAR per season of pitchers or the median WAR per season of position players.
 
 ![](charts/JAWS%20page.png)
 
@@ -92,8 +92,8 @@ Notes
 -   All tables contain both nominees and inducteees.
 -   To qualify for the JAWS-4 calculation the player must have been tenured with the Reds for at least 4 seasons.
 -   To qualify for other statistical tables players needed at least 1500 plate appearances or 500 innings.
--   Known issues and inconsistencies are listed and discussed here.
--   Explanation about the decision-making involved in the calculations is here.
+-   Known issues and inconsistencies are listed and discussed [here](https://github.com/nllspc/Sports-Analysis/blob/master/RedsJAWs/Issues.md).
+-   Explanations about the decision-making and details involved in the calculations are [here](https://github.com/nllspc/Sports-Analysis/blob/master/RedsJAWs/Notes.md).
 
 Acknowledgements
 ----------------
@@ -124,15 +124,8 @@ Data for this project was gathered from [Baseball-Reference](https://www.basebal
 
 ### Support
 
-<center>
 Special Thanks to
 
-</center>
-<center>
-<img src="charts/louisville-rstats-hex.png" width="200px" height="200px" />
+<img src="charts/louisville-rstats-hex.png" width="100px" height="100px" />
 
-</center>
-<center>
 <a href="https://github.com/louisville-rstats">Louisville RStats</a>
-
-</center>

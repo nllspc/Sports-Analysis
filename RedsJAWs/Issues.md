@@ -4,7 +4,7 @@ Issues
 -   [Pitcher JAWS](#pitcher-jaws)
 -   [Names](#names)
 -   [Home](#home)
--   [JAWS](#jaws)
+-   [JAWS-4](#jaws-4)
 
 Pitcher JAWS
 ------------
@@ -31,8 +31,8 @@ Home
 
 On the home page of the dashboard, you might notice there isn't a distribution for third basemen. You might also notice that there are only two players with their primary position being third base.
 
-JAWS
-----
+JAWS-4
+------
 
 Table: For pitchers, the values in the weighted columns aren't weighted. I didn't want to create a separate column for pitchers.
 

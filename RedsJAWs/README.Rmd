@@ -83,8 +83,8 @@ Here the user can have all the stats in front of them and compare players. Also,
 * All tables contain both nominees and inducteees.
 * To qualify for the JAWS-4 calculation the player must have been tenured with the Reds for at least 4 seasons.
 * To qualify for other statistical tables players needed at least 1500 plate appearances or 500 innings.
-* Known issues and inconsistencies are listed and discussed here.
-* Explanation about the decision-making and details involved in the calculations is [here](https://github.com/nllspc/Sports-Analysis/blob/master/RedsJAWs/Notes.md).
+* Known issues and inconsistencies are listed and discussed [here](https://github.com/nllspc/Sports-Analysis/blob/master/RedsJAWs/Issues.md).
+* Explanations about the decision-making and details involved in the calculations are [here](https://github.com/nllspc/Sports-Analysis/blob/master/RedsJAWs/Notes.md).
 
 ## Acknowledgements
 
@@ -112,25 +112,15 @@ Data for this project was gathered from [Baseball-Reference](https://www.basebal
 
 ### Support
 
-<center>
-
 Special Thanks to  
 
-</center>
 
-<center>
-
-``` {r, out.width="200px", out.height="200px", echo=FALSE}
+``` {r, out.width="100px", out.height="100px", echo=FALSE}
 
 knitr::include_graphics("charts/louisville-rstats-hex.png")
 
 ```
 
-</center>
-
-<center>
 
 <a href="https://github.com/louisville-rstats">Louisville RStats</a>
-
-</center>
 

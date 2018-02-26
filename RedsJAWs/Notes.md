@@ -40,7 +40,7 @@ Jaffe chooses primary positions according to the most WAR accumulated at a posit
 Weights
 -------
 
-Since there are different numbers of players enshrined in the HOF at each position, he evens out the position counts by adding "average" HOF players to each position (excluding pitcher) until the count at each position reaches the amount of the position that has the most players. From my understanding, he uses the mean. I'm using the median due to skewness of the distributions.
+Since there are different numbers of players enshrined in the HOF at each position, he evens out the position counts by adding "average" HOF players to each position (excluding pitcher) until the count at each position reaches the amount of the position that has the most players. From my understanding, he uses the mean of the WAR/JAWS values to calculate his average player used to fill each position. I'm using the median to be on the safe side.
 
 Hall of Fame Score
 ------------------
@@ -52,3 +52,5 @@ This score is just a standardization of the player stats. There are many standar
 ![\\text{score} = \\frac{\\text{player stat value} - \\text{HOF stat mean}}{\\text{HOF stat sd}}](https://latex.codecogs.com/png.latex?%5Ctext%7Bscore%7D%20%3D%20%5Cfrac%7B%5Ctext%7Bplayer%20stat%20value%7D%20-%20%5Ctext%7BHOF%20stat%20mean%7D%7D%7B%5Ctext%7BHOF%20stat%20sd%7D%7D "\text{score} = \frac{\text{player stat value} - \text{HOF stat mean}}{\text{HOF stat sd}}")
 
 I won't get into all the pros and cons. I'll just say I decided to go with the median/MAD method because of the skewness of many of the stat distributions. From briefly looking at both of the methods' results, I didn't find much difference. I tried to capture most of the variance between the two methods by setting the median in the scale (README.md) at -0.5 &lt; score &lt; 0.5.
+
+Also, I flipped the sign from positive to negative for SO and K% for batting stats and for L, ERA, ERA-, FIP-, xFIP-, SIERA, WHIP, BB/9, HR/9, AVG, and BB% for pitching stats. This should create a consistency for user analysis. For every stat, a positive score can now be considered "good" and a negative score as "bad".
