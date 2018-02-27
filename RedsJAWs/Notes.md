@@ -1,13 +1,21 @@
 Notes
 ================
 
--   [Eligibility for the JAWS calculation](#eligibility-for-the-jaws-calculation)
--   [Choosing Primary Positions](#choosing-primary-positions)
--   [Weights](#weights)
--   [Hall of Fame Score](#hall-of-fame-score)
+-   [Calculations](#calculations)
+    -   [Eligibility for the JAWS calculation](#eligibility-for-the-jaws-calculation)
+    -   [Choosing Primary Positions](#choosing-primary-positions)
+    -   [Weights](#weights)
+    -   [Hall of Fame Score](#hall-of-fame-score)
+-   [Issues](#issues)
+    -   [Pitcher JAWS](#pitcher-jaws)
+    -   [Names](#names)
+    -   [Home](#home)
+    -   [JAWS-4](#jaws-4)
 
-Eligibility for the JAWS calculation
-------------------------------------
+Calculations
+------------
+
+### Eligibility for the JAWS calculation
 
 The four-season-tenured constraint was decided upon by examining the distribution of the members of the Reds Hall of Fame. My initial group was only 81 players so I didn't want trim too much but I also wanted a final group that would provide a good measuring stick for future nominees. Sticking with seven years would be great. It would allow me to stay consistent with the original JAWS but it seemed unlikely. My initial thinking was that five years would satisfy my conditions.
 
@@ -32,18 +40,15 @@ From here, the choice narrowed to four or five years.
 
 Lastly, I looked at the nominees and it turns out Scott Rolen only played four seasons. The goal of this project is to evaluate nominees so four years would be the necessary cutoff in order for Rolen to be included. Yeah, I should've checked that out to begin with. I don't consider this subject closed though and plan on revisiting it in the future. Your opinions are welcome. So the inductees that didn't make it were the following: Billy Werber, Bill McKechnie, and Wayne Granger. The Wright boys, George and Harry, also aren't in there. They played with the Reds before 1871 and their WAR wasn't available.
 
-Choosing Primary Positions
---------------------------
+### Choosing Primary Positions
 
 Jaffe chooses primary positions according to the most WAR accumulated at a position. I had access to WAR per season but not per position and the information in the databases wasn't sufficient for me to perform the calculation. So I went with most games at a position during Reds tenure.
 
-Weights
--------
+### Weights
 
 Since there are different numbers of players enshrined in the HOF at each position, he evens out the position counts by adding "average" HOF players to each position (excluding pitcher) until the count at each position reaches the amount of the position that has the most players. From my understanding, he uses the mean of the WAR/JAWS values to calculate his average player used to fill each position. I'm using the median to be on the safe side.
 
-Hall of Fame Score
-------------------
+### Hall of Fame Score
 
 This score is just a standardization of the player stats. There are many standardization methods but I didn't want to wade to deep into the area. I looked at two: one uses mean and standard deviation and the other uses median and MAD.
 
@@ -54,3 +59,34 @@ This score is just a standardization of the player stats. There are many standar
 I won't get into all the pros and cons. I'll just say I decided to go with the median/MAD method because of the skewness of many of the stat distributions. From briefly looking at both of the methods' results, I didn't find much difference. I tried to capture most of the variance between the two methods by setting the median in the scale (README.md) at -0.5 &lt; score &lt; 0.5.
 
 Also, I flipped the sign from positive to negative for SO and K% for batting stats and for L, ERA, ERA-, FIP-, xFIP-, SIERA, WHIP, BB/9, HR/9, AVG, and BB% for pitching stats. This should create a consistency for user analysis. For every stat, a positive score can now be considered "good" and a negative score as "bad".
+
+Issues
+------
+
+### Pitcher JAWS
+
+Currently the WAR values in the openWARData package use a pre-2013 Baseball-Reference replacement player level. After randomly choosing some players, this change only seems to have affected Pitcher WAR. I've created an [issue](https://github.com/beanumber/openWARData/issues/11) and they seem to be looking into it.
+
+While the WAR values won't match the values at the Baseball-Reference site, it shouldn't affect the efficacy of the project too much. There isn't any mixing of pre-2013 WAR with post-2013 WAR so player comparisons are still apples to apples.
+
+### Names
+
+I worked with Baseball-Reference and FanGraphs data and there were some name conflicts. Other sources agreed with Baseball-Reference for most if not all of the instances. Other incidents involved using nicknames or not. Baseball-Reference tended to use nicknames and I'd already used their names for the other conflicts so it was easier to just stick with them. Plus some of the nicknames were too cool not to use. For Griffey Jr., I decided to not use any punctuation.
+
+-   Ken Griffey Jr not Ken Griffey ~~Jr.~~ or ~~JR~~
+-   Dick Hoblitzell not Dick ~~Hoblitzel~~
+-   Mike Smith not ~~Elmer~~ Smith
+-   Ed Taubensee not ~~Eddie~~ Taubensee
+-   Gene Thompson not ~~Junior~~ Thompson
+-   High Pockets Kelly not ~~George~~ Kelly
+-   Ice Box Chamberlain not ~~Elton~~ Chamberlain
+
+### Home
+
+On the home page of the dashboard, you might notice there isn't a distribution for third basemen. You might also notice that there are only two players with their primary position being third base.
+
+### JAWS-4
+
+Table: For pitchers, the values in the weighted columns aren't weighted. I didn't want to create a separate column for pitchers.
+
+Cleveland Dot Plots: In the legend, the label "Typical HOFer" says the value is weighted. This is ***not*** the case for pitchers or groups such as CI, MI, OF, CO, or Md.

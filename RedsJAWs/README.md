@@ -35,10 +35,11 @@ For those unfamilar with shinydashboard and DataTables, there are some basic fun
     2.  CSV: Only difference from PDF is that there is no column limit. So every column is included regardless of the size of the table.
 4.  The filter window uses [regex](https://www.regular-expressions.info) to filter the table. Note: you cannot specify the column to which the search criteria is applied. Examples:
     1.  bench|rose|Larkin returns rows that correspond to those players -- ben|bar|ros will also return those players (along with Ernie Lombardi).
-    2.  e$ returns players whose names end in "e" like Bid McPhee but not Joe Morgan. b$ can also be used to select all rows with position equal to 1B, 2B, or 3B.
-    3.  ^e returns players' names that begin with the letter "e" such as Eric Davis
-    4.  ^\[ep\] returns all players whose name begins with an "e" or a "p" but also returns every pitcher.
-    5.  Numbers may also be used. 3358 will return all rows with that string of numbers in that order.
+    2.  1B|LF selects all rows with positon equal to first base or left field but also returns Dolf Luque.
+    3.  e$ returns players whose names end in "e" like Bid McPhee but not Joe Morgan. b$ can also be used to select all rows with position equal to 1B, 2B, or 3B.
+    4.  ^e returns players' names that begin with the letter "e" such as Eric Davis
+    5.  ^\[ep\] returns all players whose name begins with an "e" or a "p" but also returns every pitcher.
+    6.  Numbers may also be used. 3358 will return all rows with that string of numbers in that order.
 
 ![](charts/Home%20Screen%20Labelled.png)
 
