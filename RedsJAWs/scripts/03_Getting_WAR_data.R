@@ -8,8 +8,8 @@ library(tidyverse)
 library(openWARData)
 library(Lahman)
 
-nomId <- read_rds("data/nomineeIds.rds")
-indId <- read_rds("data/inducteeIdsFinal.rds")
+nomId <- read_rds("data/02 - nomineeIds.rds")
+indId <- read_rds("data/02 - inducteeIdsFinal.rds")
 
 # Creating inductee (aka member) list
 indIdList <- list(indId$playerId)

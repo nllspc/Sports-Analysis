@@ -15,7 +15,7 @@ idTTa <- idTT %>% select(key_bbref, key_fangraphs, name_last, name_first) %>%
   rename(playerId = key_bbref, fangraphs_id = key_fangraphs)
 
 # Taking column from other tibble and coercing into a list
-members <- read_rds("data/memberScrape.rds")
+members <- read_rds("data/01 - memberScrape.rds")
 inductees <- list(members[,"Inductee"])
 inductees <- inductees[[1]]
 
@@ -80,14 +80,14 @@ View(indId)
 indIdComp <- filter(indId, playerId != "rosepe02" & playerId != "morgajo01"
                     & playerId != "mccormi03" & playerId != "andersp01" 
                     & playerId != "wrighge03" & playerId != "hutchfr01")
-write_rds(indIdComp, "data/inducteeIdsComplete.rds")
+write_rds(indIdComp, "data/02 - inducteeIdsComplete.rds")
 
 
 # 5 players are getting cut. See EDA.R script for the details
 indIdFinal <- filter(indIdComp, playerId != "grangwa01" & playerId != "mckecbi01"
                      & playerId != "werbebi01" & playerId != "wrighge01"
                      & playerId != "wrighha01")
-write_rds(indIdFinal, "data/inducteeIdsFinal.rds")
+write_rds(indIdFinal, "data/02 - inducteeIdsFinal.rds")
 
 
 
@@ -98,6 +98,6 @@ nomId <- map_dfr(nomNamList, indFilter)
 
 # Snagged an extra Sanders. Filtered rWAR again. Dropping the older one.
 nomId <- filter(nomId, playerId != "sandere01")
-write_rds(nomId, "data/nomineeIds.rds")
+write_rds(nomId, "data/02 - nomineeIds.rds")
 
 

@@ -1,5 +1,5 @@
 # ui 
-
+# rsconnect::deployApp(appName="jaws4")
 
 
 library(shiny)
@@ -60,6 +60,12 @@ dashSidebar <- dashboardSidebar(
 
 
 dashBody <- dashboardBody(
+      
+      tags$head(
+            tags$script(src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.5.16/iframeResizer.contentWindow.min.js",
+                        type="text/javascript")
+      ),
+      
       tags$head(
             tags$style(HTML('
                             /* Changes color of title portion of header */
@@ -89,6 +95,7 @@ dashBody <- dashboardBody(
                  ".shiny-output-error { visibility: hidden; }",
                  ".shiny-output-error:before { visibility: hidden; }"
       ),
+      
       
       tabItems(
             tabItem(
@@ -332,7 +339,8 @@ dashBody <- dashboardBody(
                         )
                   )
             )
-      )
+      ),
+      HTML('<div data-iframe-height></div>')
 )
 
 
