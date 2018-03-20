@@ -5,6 +5,8 @@
 library(tidyverse)
 library(openWARData)
 
+
+
 # loading dataset with appropriate IDs. idTT is part of the openWARData pkg.
 str(idTT)
 head(idTT)
@@ -41,13 +43,15 @@ count(distinct(indTib))
 # Seven missing values
 sum(indID$playerId=="")
 
-#==========================================================
-
+#============================================================
 
 
 # Taking that list and filtering the tibble to get inductee names. Also filtering out missing values.
 indFilter2 <- function(x) filter(idTTa, name_whole == x & playerId != "")
 indID <- map_dfr(inductees, indFilter2)
+
+
+# Need to run code I sectioned above for this to work ===========================
 
 # Lets compare the two player lists and see what the filter loop missed
 ## Column names have to match.
@@ -56,6 +60,9 @@ indIDnam <- indID %>% select(name_whole)
 # Some vowel marks, etc in the names are large part of the problem
 # Don't see anything wrong w/Giles, Howsam, Herrmann though. Need to do some research on those birds.
 missNames <- setdiff(indTib,indIDnam)
+
+# ==============================================================================
+
 
 # From members list, Giles was president/GM; Howsam was a GM; Herrmann was president, so they can 
 # remain removed.
@@ -76,7 +83,7 @@ missId <- filter(missId, playerId != "borbope02")
 indId <- bind_rows(indID, missId)
 View(indId)
 
-# Removing extra Pete Rose, Joe Morgan, Mike McCormick, George Wright. Figured which ones to drop by filtering rWAR data set and looking at the years played. Plus Sparky and Hutchinson are managers. Final count = 81.
+# Removing extra Pete Rose, Joe Morgan, Mike McCormick, George Wright. Figured which ones to drop by filtering rWAR data set and looking at the years played. Plus Sparky and Hutchinson are managers. Count = 81.
 indIdComp <- filter(indId, playerId != "rosepe02" & playerId != "morgajo01"
                     & playerId != "mccormi03" & playerId != "andersp01" 
                     & playerId != "wrighge03" & playerId != "hutchfr01")

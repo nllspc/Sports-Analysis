@@ -90,3 +90,54 @@ On the home page of the dashboard, you might notice there isn't a distribution f
 Table: For pitchers, the values in the weighted columns aren't weighted. I didn't want to create a separate column for pitchers.
 
 Cleveland Dot Plots: In the legend, the label "Typical HOFer" says the value is weighted. This is ***not*** the case for pitchers or groups such as CI, MI, OF, CO, or Md.
+
+<table>
+<caption>
+Inductees
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Cutoff
+</th>
+<th style="text-align:left;">
+% Cutoff
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+7 yrs
+</td>
+<td style="text-align:left;">
+67%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+6 yrs
+</td>
+<td style="text-align:left;">
+78%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+5 yrs
+</td>
+<td style="text-align:left;">
+86%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+4 yrs
+</td>
+<td style="text-align:left;">
+92%
+</td>
+</tr>
+</tbody>
+</table>
+<!-- %>% --> <!--      kable_styling() %>% --> <!--      row_spec(4, bold = T, color = "white", background = "#C6011F") -->

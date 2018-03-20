@@ -1,5 +1,5 @@
 # Reds WAR positions
-# Need to figure out what the primary position was during inductees' top 4 WAR years so I can create position distributions
+# Need to figure out what the primary position was during inductees' Reds tenure so I can create position distributions
 
 
 library(tidyverse)

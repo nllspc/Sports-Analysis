@@ -82,3 +82,24 @@ On the home page of the dashboard, you might notice there isn't a distribution f
 Table: For pitchers, the values in the weighted columns aren't weighted. I didn't want to create a separate column for pitchers.
 
 Cleveland Dot Plots: In the legend, the label "Typical HOFer" says the value is weighted. This is ***not*** the case for pitchers or groups such as CI, MI, OF, CO, or Md.
+
+
+
+
+```{r eda-tab, echo=FALSE}
+library(knitr)
+library(kableExtra)
+kable(matrix(c(
+      '7 yrs', '67%',
+      '6 yrs', '78%',
+      '5 yrs', '86%',
+      '4 yrs', '92%',
+      NULL
+), ncol = 2, byrow=TRUE, dimnames = list(NULL, c('Cutoff', '% Cutoff'))), format = "html",
+booktabs=TRUE, caption = 'Inductees') %>%
+      kable_styling() %>%
+      row_spec(4, bold = T, color = "white", background = "#C6011F")
+      
+
+```
+
