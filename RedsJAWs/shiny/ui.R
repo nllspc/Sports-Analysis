@@ -61,11 +61,13 @@ dashSidebar <- dashboardSidebar(
 
 dashBody <- dashboardBody(
       
+      # Allows for putting app in a webpage (part 1)
       tags$head(
             tags$script(src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.5.16/iframeResizer.contentWindow.min.js",
                         type="text/javascript")
       ),
       
+      # Changes color of header
       tags$head(
             tags$style(HTML('
                             /* Changes color of title portion of header */
@@ -91,6 +93,7 @@ dashBody <- dashboardBody(
             
       ),
       
+      # Stops errors being displayed in plot windows
       tags$style(type="text/css",
                  ".shiny-output-error { visibility: hidden; }",
                  ".shiny-output-error:before { visibility: hidden; }"
@@ -340,6 +343,8 @@ dashBody <- dashboardBody(
                   )
             )
       ),
+      
+      # Allows for putting app in a webpage (part 2)
       HTML('<div data-iframe-height></div>')
 )
 

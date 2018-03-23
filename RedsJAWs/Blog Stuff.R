@@ -1,4 +1,0 @@
-# Notes
-# for blog post
-
-# Now I wanted to see who would be left out at each cutoff. While I am a Reds fan, I am not well-versed in their history. So it's quite possible that there are some historically famous players on these two lists that I'm not aware of, but I did recognize one name, Dave "The Cobra" Parker. Mr. Parker only had four seasons with the Reds. If you look at his WAR, he had one good season and the others were poor, but if you look closer he got dinged heavily for his defense and was pretty good offensively, especially in 1985. WAR is what matters here though and Dave is lacking. It also shouldn't matter that he's a hometown kid, his nickname is **The Cobra**, and used to swing a sledge hammer in the batter's circle. I decided to stick a pin in it.

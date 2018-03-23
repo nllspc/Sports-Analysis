@@ -14,7 +14,8 @@ groupWandJ <- read_rds("data/08 - unweightedandGroupJoyplot.rds")
 wtWandJ <- read_rds("data/08 - weightedPositionJoyPlot.rds")
 groupSummary <- read_rds("data/07b - otherGroupSummary.rds")
 
-
+# Positional non-weighted averages
+# Will alsoe be used for Pitcher averages on JAWS page since they're unweighted
 avgPOS_FUN <- function(x) {
       
       n_vector <- iWandJ %>% 
@@ -36,7 +37,7 @@ avgHofPos <- map_dfr(unique(iWandJ$POS), avgPOS_FUN) %>%
       select(POS, number, everything(), -n)
 
 
-
+# Calculating weighted averages for positional players
 wtAvgPOS_FUN <- function(x) {
       
       n_vector <- wtWandJ %>% 
