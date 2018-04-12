@@ -2,7 +2,7 @@
 
 # rsconnect::deployApp(appName="jaws4-post")
 
-
+# url: https://erbo.shinyapps.io/jaws4-post
 
 
 library(shiny)
